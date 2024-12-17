@@ -7,7 +7,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### `npx create-react-app myth-collection-ui`
 
 
-### `npm install --save-dev ajv@8`
+### `npm install ajv@latest ajv-keywords@latest`
 
 ## Available Scripts
 
