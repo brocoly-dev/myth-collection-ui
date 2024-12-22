@@ -16,26 +16,22 @@ const FigureForm = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        /*
-        axios.post('http://localhost:8080/figurines')
-            .then(response => console.log(response.data))
-            .catch(error => console.error('Error creating a new figure item:', error));
-            */
-        try {
-            // Sending POST request with JSON data
-            const res = axios.post('http://localhost:8080/api/figurines', formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            setResponse(res.data);
-            console.log('Response:', res.data); // handle the response as needed
-
-            // Optionally, you can reset the form or display a success message
-        } catch (error) {
-            console.error('Error creating figurine:', error.res ? error.res.data : error.message);
-        }
-    };
+        axios.post('http://localhost:8080/api/figurines', formData, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(function (resp) {
+            // handle success
+            console.log(resp.data);
+            setResponse(resp.data.baseName)
+        }).catch(function (error) {
+            // handle error
+            console.log('The backend returned a bad error');
+            console.log(error);
+        }).finally(function () {
+            // always executed
+        });
+    }
 
     return (
         <Box
