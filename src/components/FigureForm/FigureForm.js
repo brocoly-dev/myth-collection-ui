@@ -6,6 +6,7 @@ const FigureForm = () => {
     const [formData, setFormData] = useState({
         baseName: ""
     });
+    const [errors, setErrors] = useState("");
     const [response, setResponse] = useState("");
 
     const handleChange = (event) => {
@@ -26,8 +27,8 @@ const FigureForm = () => {
             setResponse(resp.data.baseName)
         }).catch(function (error) {
             // handle error
-            console.log('The backend returned a bad error');
-            console.log(error);
+            console.log(error.response.data.messages[0]);
+            setErrors(error.response.data.messages[0]);
         }).finally(function () {
             // always executed
         });
@@ -53,7 +54,8 @@ const FigureForm = () => {
                     required id="outlined-basic"
                     label="Base Name"
                     variant="outlined"
-                    helperText="Incorrect entry."
+                    error={Boolean(errors)}
+                    helperText={errors}
                     size="small"
                     name="baseName"
                     value={formData.baseName}
