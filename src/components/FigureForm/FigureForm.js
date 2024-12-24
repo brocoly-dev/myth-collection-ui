@@ -1,10 +1,11 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
-import axios from "axios";
+import axiosInstance from './axiosInterceptor'
 
 const FigureForm = () => {
     const [formData, setFormData] = useState({
-        baseName: ""
+        baseName: "",
+        tamashiiUrl: " 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 22 2 2 2 "
     });
     const [errors, setErrors] = useState("");
     const [response, setResponse] = useState("");
@@ -17,7 +18,7 @@ const FigureForm = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        axios.post('http://localhost:8080/api/figurines', formData, {
+        axiosInstance.post('/figurines', formData, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -27,8 +28,8 @@ const FigureForm = () => {
             setResponse(resp.data.baseName)
         }).catch(function (error) {
             // handle error
-            console.log(error.response.data.messages[0]);
-            setErrors(error.response.data.messages[0]);
+            console.log(error.response.data.validations);
+            //setErrors(error.response.data.messages[0]);
         }).finally(function () {
             // always executed
         });
