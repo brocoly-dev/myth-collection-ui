@@ -10,6 +10,7 @@ const FigureForm = () => {
         baseName: "",
     });
     const [response, setResponse] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -25,6 +26,7 @@ const FigureForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setLoading(true);
 
         axiosInstance.post('/figurines', formData, {
             headers: {
@@ -35,15 +37,22 @@ const FigureForm = () => {
             console.log(resp.data);
             setResponse(resp.data.baseName)
         }).catch(function (error) {
-            // handle error
-            const backendErrors = error.response.data.validations;
+            // If the error is a validation error from backend
+            if (error.response && error.response.data && error.response.data.validations) {
+                // handle error
+                const backendErrors = error.response.data.validations;
 
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                ...backendErrors, // Merge the backend errors into the state
-            }));
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    ...backendErrors, // Merge the backend errors into the state
+                }));
+            } else {
+                // Handle other errors (e.g., network issues)
+                console.error("Error submitting form", error);
+            }
         }).finally(function () {
             // always executed
+            setLoading(false);
         });
     }
 
@@ -74,8 +83,8 @@ const FigureForm = () => {
                     value={formData.baseName}
                     onChange={handleChange} />
 
-                <Button type="submit" variant="contained" color="primary">
-                    Submit
+                <Button type="submit" variant="contained" color="primary" disabled={loading}>
+                    {loading ? "Submitting..." : "Submit"}
                 </Button>
             </form>
             {response && (
