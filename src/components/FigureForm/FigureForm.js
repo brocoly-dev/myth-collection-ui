@@ -1,23 +1,32 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
-import axios from "axios";
+import axiosInstance from './axiosValidationInterceptor'
 
 const FigureForm = () => {
     const [formData, setFormData] = useState({
-        baseName: ""
+        baseName: "",
     });
-    const [errors, setErrors] = useState("");
+    const [errors, setErrors] = useState({
+        baseName: "",
+    });
     const [response, setResponse] = useState("");
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [name]: "",
+        }));
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        axios.post('http://localhost:8080/api/figurines', formData, {
+        axiosInstance.post('/figurines', formData, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -27,8 +36,12 @@ const FigureForm = () => {
             setResponse(resp.data.baseName)
         }).catch(function (error) {
             // handle error
-            console.log(error.response.data.messages[0]);
-            setErrors(error.response.data.messages[0]);
+            const backendErrors = error.response.data.validations;
+
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                ...backendErrors, // Merge the backend errors into the state
+            }));
         }).finally(function () {
             // always executed
         });
@@ -54,8 +67,8 @@ const FigureForm = () => {
                     required id="outlined-basic"
                     label="Base Name"
                     variant="outlined"
-                    error={Boolean(errors)}
-                    helperText={errors}
+                    error={Boolean(errors.baseName)}
+                    helperText={errors.baseName}
                     size="small"
                     name="baseName"
                     value={formData.baseName}
