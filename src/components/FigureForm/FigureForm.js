@@ -1,18 +1,26 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
-import axiosInstance from './axiosInterceptor'
+import axiosInstance from './axiosValidationInterceptor'
 
 const FigureForm = () => {
     const [formData, setFormData] = useState({
         baseName: "",
-        tamashiiUrl: " 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 22 2 2 2 "
     });
-    const [errors, setErrors] = useState("");
+    const [errors, setErrors] = useState({
+        baseName: "",
+    });
     const [response, setResponse] = useState("");
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [name]: "",
+        }));
     };
 
     const handleSubmit = (event) => {
@@ -28,8 +36,12 @@ const FigureForm = () => {
             setResponse(resp.data.baseName)
         }).catch(function (error) {
             // handle error
-            console.log(error.response.data.validations);
-            //setErrors(error.response.data.messages[0]);
+            const backendErrors = error.response.data.validations;
+
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                ...backendErrors, // Merge the backend errors into the state
+            }));
         }).finally(function () {
             // always executed
         });
@@ -55,8 +67,8 @@ const FigureForm = () => {
                     required id="outlined-basic"
                     label="Base Name"
                     variant="outlined"
-                    error={Boolean(errors)}
-                    helperText={errors}
+                    error={Boolean(errors.baseName)}
+                    helperText={errors.baseName}
                     size="small"
                     name="baseName"
                     value={formData.baseName}

@@ -8,15 +8,7 @@ const instance = axios.create({
 // Add a response interceptor
 instance.interceptors.response.use(
     (response) => {
-        alert("d");
-        console.log('ssss');
-        // Modify the response here before it's passed to your application
-        // Example: Add a custom field or modify data
-        if (response.data) {
-            // For example, let's assume you want to transform the data
-            response.data.transformed = true;
-        }
-        return response;  // Return the modified response
+        return response;  // Return the response without any change
     },
     (error) => {
         error.response.data.validations = new Object(); // a new JSON field is created.
@@ -26,12 +18,10 @@ instance.interceptors.response.use(
             let field = errorMessage.substring(0, index);
             let value = errorMessage.substring(index + 2);
 
-            error.response.data.validations[field] = value;
+            error.response.data.validations[field] = value; // dynamic JSON key and value are created here.
         });
+        delete error.response.data.messages; // Removes the original 'messages' field.
 
-        delete error.response.data.messages; // Removes the original messages field.
-
-        console.log(error.response);
         // Handle errors globally, if any
         return Promise.reject(error);  // You can choose to reject or handle the error
     }
