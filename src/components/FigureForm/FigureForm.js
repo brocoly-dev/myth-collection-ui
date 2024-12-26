@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid2, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
 import axiosInstance from './axiosValidationInterceptor'
 
@@ -58,6 +58,8 @@ const FigureForm = () => {
 
     return (
         <Box
+            component="form"
+            onSubmit={handleSubmit}
             sx={{
                 maxWidth: 500,
                 mx: "auto",
@@ -68,30 +70,49 @@ const FigureForm = () => {
                 bgcolor: "Background.paper"
             }}>
             <Typography variant="h4" mb={3}>
-                Submit Your Info
+                Create new Myth Cloth item
             </Typography>
-            <form onSubmit={handleSubmit}>
+            <Grid2 container spacing={2}>
+                <Grid2 size={12}>
+                    <TextField
+                        required
+                        label="Base Name"
+                        name="baseName"
+                        value={formData.baseName}
+                        error={Boolean(errors.baseName)}
+                        helperText={errors.baseName}
+                        onChange={handleChange}
+                        size="small"
+                        fullWidth />
+                </Grid2>
+                <Grid2 size={12}>
+                    <Divider />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth />
+                </Grid2>
 
-                <TextField
-                    required id="outlined-basic"
-                    label="Base Name"
-                    variant="outlined"
-                    error={Boolean(errors.baseName)}
-                    helperText={errors.baseName}
-                    size="small"
-                    name="baseName"
-                    value={formData.baseName}
-                    onChange={handleChange} />
-
-                <Button type="submit" variant="contained" color="primary" disabled={loading}>
-                    {loading ? "Submitting..." : "Submit"}
-                </Button>
-            </form>
-            {response && (
-                <Typography variant="body1" color="success.main" mt={2}>
-                    {response}
-                </Typography>
-            )}
+                <Grid2 size={4}>
+                    <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
+                        {loading ? "Submitting..." : "Submit"}
+                    </Button>
+                </Grid2>
+            </Grid2>
         </Box>
     );
 };
