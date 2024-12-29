@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Grid2, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import React, { useState } from 'react';
 import axiosInstance from './axiosValidationInterceptor'
 
@@ -9,6 +9,7 @@ const FigureForm = () => {
     const [errors, setErrors] = useState({
         baseName: "",
     });
+
     const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -89,7 +90,22 @@ const FigureForm = () => {
                     <Divider />
                 </Grid2>
                 <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
+                    <FormControl size="small" fullWidth variant="outlined">
+                        <InputLabel id="distributor-label">Distributor</InputLabel>
+                        <Select
+                            labelId="distributor-label"
+                            label="Distributor"
+                            value={formData.baseName}
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={10}>DAM</MenuItem>
+                            <MenuItem value={20}>DTM</MenuItem>
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
                 </Grid2>
                 <Grid2 size={4}>
                     <TextField size="small" fullWidth />
@@ -113,6 +129,8 @@ const FigureForm = () => {
                     </Button>
                 </Grid2>
             </Grid2>
+
+
         </Box>
     );
 };
