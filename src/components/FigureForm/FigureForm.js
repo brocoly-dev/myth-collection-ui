@@ -1,16 +1,42 @@
 import axiosInstance from './axiosValidationInterceptor'
 import { Box, Button, Grid2, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FigureDistribution from '../FigureDistribution/FigureDistribution';
 
 const FigureForm = () => {
+
+    // State to store the list of distributos
+    const [distributorsData, setDistributorsData] = useState([]);
+    // State to handle the form information
     const [formData, setFormData] = useState({
         baseName: "",
     });
+    // State to handle errors
     const [errors, setErrors] = useState({
         baseName: "",
     });
+    // State to handle loading state
     const [loading, setLoading] = useState(false);
+
+    // Fetch the data when the component mounts
+    useEffect(() => {
+        axiosInstance.get('/distributors')
+            .then(function (response) {
+                console.log(response.data);
+                setDistributorsData(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the distributors", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the distributors", error);
+                }
+            });
+    }, []); // Empty dependency array means this runs once when the component mounts
+
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
@@ -84,8 +110,8 @@ const FigureForm = () => {
                         size="small"
                         fullWidth />
                 </Grid2>
-                <FigureDistribution distributorDisabled={true} />
-                <FigureDistribution />
+                <FigureDistribution distributors={distributorsData} distributorDisabled={true} />
+                <FigureDistribution distributors={distributorsData}/>
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}
