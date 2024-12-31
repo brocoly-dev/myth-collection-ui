@@ -1,6 +1,7 @@
-import { Box, Button, Divider, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
-import React, { useState } from 'react';
 import axiosInstance from './axiosValidationInterceptor'
+import { Box, Button, Grid2, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import FigureDistribution from '../FigureDistribution/FigureDistribution';
 
 const FigureForm = () => {
     const [formData, setFormData] = useState({
@@ -9,11 +10,9 @@ const FigureForm = () => {
     const [errors, setErrors] = useState({
         baseName: "",
     });
-
-    const [response, setResponse] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (event) => {
+    const handleFormChange = (event) => {
         const { name, value } = event.target;
         setFormData({
             ...formData,
@@ -25,7 +24,7 @@ const FigureForm = () => {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleFormSubmit = (event) => {
         event.preventDefault();
         setLoading(true);
 
@@ -36,7 +35,6 @@ const FigureForm = () => {
         }).then(function (resp) {
             // handle success
             console.log(resp.data);
-            setResponse(resp.data.baseName)
         }).catch(function (error) {
             // If the error is a validation error from backend
             if (error.response && error.response.data && error.response.data.validations) {
@@ -52,7 +50,6 @@ const FigureForm = () => {
                 console.error("Error submitting form", error);
             }
         }).finally(function () {
-            // always executed
             setLoading(false);
         });
     }
@@ -60,7 +57,7 @@ const FigureForm = () => {
     return (
         <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleFormSubmit}
             sx={{
                 maxWidth: 500,
                 mx: "auto",
@@ -69,7 +66,8 @@ const FigureForm = () => {
                 boxShadow: 3,
                 borderRadius: 2,
                 bgcolor: "Background.paper"
-            }}>
+            }}
+        >
             <Typography variant="h4" mb={3}>
                 Create new Myth Cloth item
             </Typography>
@@ -82,55 +80,18 @@ const FigureForm = () => {
                         value={formData.baseName}
                         error={Boolean(errors.baseName)}
                         helperText={errors.baseName}
-                        onChange={handleChange}
+                        onChange={handleFormChange}
                         size="small"
                         fullWidth />
                 </Grid2>
-                <Grid2 size={12}>
-                    <Divider />
-                </Grid2>
-                <Grid2 size={4}>
-                    <FormControl size="small" fullWidth variant="outlined">
-                        <InputLabel id="distributor-label">Distributor</InputLabel>
-                        <Select
-                            labelId="distributor-label"
-                            label="Distributor"
-                            value={formData.baseName}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={10}>DAM</MenuItem>
-                            <MenuItem value={20}>DTM</MenuItem>
-                        </Select>
-                        <FormHelperText>Choose an option</FormHelperText>
-                    </FormControl>
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth />
-                </Grid2>
-
+                <FigureDistribution distributorDisabled={true} />
+                <FigureDistribution />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}
                     </Button>
                 </Grid2>
             </Grid2>
-
-
         </Box>
     );
 };
