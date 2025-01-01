@@ -5,9 +5,12 @@ const FigureDistribution = ({ distributors, distributorDisabled = false }) => {
     // State to manage the selected option
     const [selectedOption, setSelectedOption] = useState('');
 
-    const handleChange = (event) => {
-        console.log('Option Selected: ' + event.target.value);
-        setSelectedOption(event.target.value);
+    const handleSelectChange = (event) => {
+        const value = event.target.value;
+        const index = value.indexOf("|");
+        const text = value.substring(index + 1);
+
+        setSelectedOption(value);
     };
     return (
         <>
@@ -21,14 +24,14 @@ const FigureDistribution = ({ distributors, distributorDisabled = false }) => {
                         labelId="distributor-label"
                         label="Distributor"
                         value={selectedOption}
-                        onChange={handleChange}
+                        onChange={handleSelectChange}
                     >
                         {/* Render the MenuItem components based on the fetched data */}
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>
                         {distributors.map((item) => (
-                            <MenuItem key={item.id} value={item.id}>
+                            <MenuItem key={item.id} value={item.id + '|' + item.name}>
                                 {item.name}  {/* Display the item name, adjust to match your object structure */}
                             </MenuItem>
                         ))}
