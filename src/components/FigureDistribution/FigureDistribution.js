@@ -1,21 +1,20 @@
-import { Divider, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Divider, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select } from "@mui/material";
 import { useState } from "react";
 
-const FigureDistribution = ({ distributors, distributorDisabled = false }) => {
+const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, sendDataToParent }) => {
     // State to manage the selected option
     const [selectedOption, setSelectedOption] = useState('');
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
-        const index = value.indexOf("|");
-        const text = value.substring(index + 1);
+        sendDataToParent(value);
 
         setSelectedOption(value);
     };
     return (
         <>
             <Grid2 size={12}>
-                <Divider />
+                <Divider>{label}</Divider>
             </Grid2>
             <Grid2 size={4}>
                 <FormControl size="small" disabled={distributorDisabled} fullWidth variant="outlined">
@@ -40,19 +39,19 @@ const FigureDistribution = ({ distributors, distributorDisabled = false }) => {
                 </FormControl>
             </Grid2>
             <Grid2 size={4}>
-                <TextField size="small" fullWidth />
+
             </Grid2>
             <Grid2 size={4}>
-                <TextField size="small" fullWidth />
+
             </Grid2>
             <Grid2 size={4}>
-                <TextField size="small" fullWidth />
+
             </Grid2>
             <Grid2 size={4}>
-                <TextField size="small" fullWidth />
+
             </Grid2>
             <Grid2 size={4}>
-                <TextField size="small" fullWidth />
+
             </Grid2>
         </>
     );

@@ -22,7 +22,6 @@ const FigureForm = () => {
     useEffect(() => {
         axiosInstance.get('/distributors')
             .then(function (response) {
-                console.log(response.data);
                 setDistributorsData(response.data);  // Assume response.data is an array of objects
             }).catch(function (error) {
                 // If the error is a validation error from backend
@@ -37,9 +36,22 @@ const FigureForm = () => {
             });
     }, []); // Empty dependency array means this runs once when the component mounts
 
+    // Function to handle data received from the child
+    const handleDataFromChild = (data) => {
+        console.log("Data received from child");
+        const index = data.indexOf("|");
+        const value = data.substring(0, index);
+        const text = data.substring(index + 1);
+
+        console.log(text);
+        console.log(value);
+    };
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
+        console.log("Name: " + name);
+        console.log("Value: " + value);
+
         setFormData({
             ...formData,
             [name]: value
@@ -110,8 +122,17 @@ const FigureForm = () => {
                         size="small"
                         fullWidth />
                 </Grid2>
-                <FigureDistribution distributors={distributorsData} distributorDisabled={true} />
-                <FigureDistribution distributors={distributorsData}/>
+                <FigureDistribution
+                    label="Distribution in Japan"
+                    id="JPY"
+                    distributors={distributorsData}
+                    distributorDisabled={true}
+                    sendDataToParent={handleDataFromChild} />
+                <FigureDistribution
+                    label="Distribution in Mexico"
+                    id="MXN"
+                    distributors={distributorsData}
+                    sendDataToParent={handleDataFromChild} />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}
