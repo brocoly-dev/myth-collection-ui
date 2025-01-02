@@ -6,10 +6,24 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
     const [selectedOption, setSelectedOption] = useState('');
 
     const handleSelectChange = (event) => {
-        const value = event.target.value;
-        sendDataToParent(value);
+        const fieldName = event.target.name;
+        const fieldValue = event.target.value;
 
-        setSelectedOption(value);
+        if (fieldValue === "") {
+            sendDataToParent(id, null); // no JSON object is sent to parent
+        } else {
+            const index = fieldValue.indexOf("|");
+            const value = fieldValue.substring(0, index);
+            const text = fieldValue.substring(index + 1);
+
+            const jsonObject = {};
+            jsonObject[fieldName] = {
+                id: value,
+                name: text
+            };
+            sendDataToParent(id, jsonObject);
+        }
+        setSelectedOption(fieldValue);
     };
     return (
         <>
@@ -22,6 +36,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                     <Select
                         labelId="distributor-label"
                         label="Distributor"
+                        name="distributor"
                         value={selectedOption}
                         onChange={handleSelectChange}
                     >

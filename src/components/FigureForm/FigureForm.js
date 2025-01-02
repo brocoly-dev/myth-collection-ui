@@ -37,14 +37,18 @@ const FigureForm = () => {
     }, []); // Empty dependency array means this runs once when the component mounts
 
     // Function to handle data received from the child
-    const handleDataFromChild = (data) => {
+    const handleDataFromChild = (id, data) => {
         console.log("Data received from child");
-        const index = data.indexOf("|");
-        const value = data.substring(0, index);
-        const text = data.substring(index + 1);
 
-        console.log(text);
-        console.log(value);
+        console.log(id);
+        console.log(data);
+
+        const distribution = "distribution" + id;
+
+        setFormData({
+            ...formData,
+            [distribution]: data
+        });
     };
 
     const handleFormChange = (event) => {
