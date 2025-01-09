@@ -37,18 +37,26 @@ const FigureForm = () => {
     }, []); // Empty dependency array means this runs once when the component mounts
 
     // Function to handle data received from the child
-    const handleDataFromChild = (id, data) => {
-        console.log("Data received from child");
-
-        console.log(id);
-        console.log(data);
+    const handleDataFromFigureDistributionChild = (id, fieldName, value) => {
+        console.log("Id: " + id);
+        console.log("Name: " + fieldName);
+        console.log("Value: " + value);
 
         const distribution = "distribution" + id;
+        if (!(distribution in formData)) {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [distribution]: {} // creates the distributionMXN or distributionJPY empty structure.
+            }));
+        }
 
-        setFormData({
-            ...formData,
-            [distribution]: data
-        });
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [distribution]: {
+                ...prevFormData[distribution],
+                [fieldName]: value, // Update only the field under either distributionMXN or distributionJPY
+            },
+        }));
     };
 
     const handleFormChange = (event) => {
@@ -131,12 +139,14 @@ const FigureForm = () => {
                     id="JPY"
                     distributors={distributorsData}
                     distributorDisabled={true}
-                    sendDataToParent={handleDataFromChild} />
+                    currency="¥"
+                    sendDataToParent={handleDataFromFigureDistributionChild} />
                 <FigureDistribution
                     label="Distribution in Mexico"
                     id="MXN"
                     distributors={distributorsData}
-                    sendDataToParent={handleDataFromChild} />
+                    currency="$"
+                    sendDataToParent={handleDataFromFigureDistributionChild} />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}
