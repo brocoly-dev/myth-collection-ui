@@ -1,9 +1,11 @@
-import { Divider, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select } from "@mui/material";
+import { Divider, FormControl, FormHelperText, Grid2, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
 import { useState } from "react";
 
-const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, sendDataToParent }) => {
+const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent }) => {
     // State to manage the selected option
     const [selectedOption, setSelectedOption] = useState('');
+    // State to manage the basePrice input
+    const [basePriceValue, setBasePriceValue] = useState('');
 
     const handleSelectChange = (event) => {
         const fieldName = event.target.name;
@@ -16,15 +18,42 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
             const value = fieldValue.substring(0, index);
             const text = fieldValue.substring(index + 1);
 
-            const jsonObject = {};
-            jsonObject[fieldName] = {
+            const jsonObject = {
                 id: value,
                 name: text
             };
-            sendDataToParent(id, jsonObject);
+
+            sendDataToParent(id, fieldName, jsonObject);
         }
         setSelectedOption(fieldValue);
     };
+
+    const handleChange = (event) => {
+        const fieldName = event.target.name;
+        const inputValue = event.target.value;
+
+        // Allow only numbers and one decimal point
+        const validValue = inputValue.replace(/[^0-9.]/g, "");
+        const parts = validValue.split(".");
+
+        let value;
+        // Ensure only one decimal point
+        if (parts.length > 2) {
+            value = parts[0] + "." + parts[1];
+        } else {
+            value = validValue;
+        }
+
+        sendDataToParent(id, fieldName, value);
+
+        // Ensure only one decimal point
+        if (parts.length > 2) {
+            setBasePriceValue(value);
+        } else {
+            setBasePriceValue(value);
+        }
+    }
+
     return (
         <>
             <Grid2 size={12}>
@@ -54,7 +83,17 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                 </FormControl>
             </Grid2>
             <Grid2 size={4}>
-
+                <FormControl size="small" fullWidth>
+                    <InputLabel htmlFor="basePrice-label">Base Price</InputLabel>
+                    <OutlinedInput
+                        id="basePrice-label"
+                        startAdornment={<InputAdornment position="start">{currency}</InputAdornment>}
+                        label="Base Price"
+                        name="basePrice"
+                        value={basePriceValue}
+                        onChange={handleChange}
+                    />
+                </FormControl>
             </Grid2>
             <Grid2 size={4}>
 

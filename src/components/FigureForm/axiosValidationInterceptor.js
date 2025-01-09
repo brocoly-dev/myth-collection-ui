@@ -11,7 +11,7 @@ instance.interceptors.response.use(
         return response;  // Return the response without any change
     },
     (error) => {
-        error.response.data.validations = new Object(); // a new JSON field is created.
+        error.response.data.validations = {}; // a new JSON field is created.
 
         error.response.data.messages.forEach(function (errorMessage) {
             let index = errorMessage.indexOf(":");
