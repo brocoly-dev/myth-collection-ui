@@ -109,7 +109,7 @@ const FigureForm = () => {
             component="form"
             onSubmit={handleFormSubmit}
             sx={{
-                maxWidth: 500,
+                maxWidth: 750,
                 mx: "auto",
                 mt: 5,
                 p: 3,
@@ -140,13 +140,15 @@ const FigureForm = () => {
                     distributors={distributorsData}
                     distributorDisabled={true}
                     currency="¥"
-                    sendDataToParent={handleDataFromFigureDistributionChild} />
+                    sendDataToParent={handleDataFromFigureDistributionChild}
+                    firstAnnouncementDateLabel="First Announcement Date" />
                 <FigureDistribution
                     label="Distribution in Mexico"
                     id="MXN"
                     distributors={distributorsData}
                     currency="$"
-                    sendDataToParent={handleDataFromFigureDistributionChild} />
+                    sendDataToParent={handleDataFromFigureDistributionChild}
+                    firstAnnouncementDateLabel="Confirmation Date" />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}

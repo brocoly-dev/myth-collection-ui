@@ -1,11 +1,40 @@
-import { Divider, FormControl, FormHelperText, Grid2, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
+import { Divider, FormControl, FormHelperText, Grid2, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField } from "@mui/material";
 import { useState } from "react";
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from "dayjs";
+import { format } from 'date-fns';
 
-const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent }) => {
+const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent, firstAnnouncementDateLabel }) => {
+    // State to manage the selected date
+    const [firstAnnouncementDateValue, setFirstAnnouncementDateValue] = useState(null);
+    // State to manage the selected date
+    const [preOrderDateValue, setPreOrderDateValue] = useState(null);
     // State to manage the selected option
     const [selectedOption, setSelectedOption] = useState('');
     // State to manage the basePrice input
     const [basePriceValue, setBasePriceValue] = useState('');
+
+    const handleFirstDateChange = (fieldName, fieldValue) => {
+        try {
+            const formatted = format(fieldValue, 'yyyy-MM-dd');
+            sendDataToParent(id, fieldName, formatted);
+        } catch (error) {
+            sendDataToParent(id, fieldName, null);
+        }
+
+        setFirstAnnouncementDateValue(fieldValue);
+    };
+
+    const handlePreOrderDateChange = (fieldName, fieldValue) => {
+        try {
+            const formatted = format(fieldValue, 'yyyy-MM-dd');
+            sendDataToParent(id, fieldName, formatted);
+        } catch (error) {
+            sendDataToParent(id, fieldName, null);
+        }
+
+        setPreOrderDateValue(fieldValue);
+    };
 
     const handleSelectChange = (event) => {
         const fieldName = event.target.name;
@@ -96,10 +125,34 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                 </FormControl>
             </Grid2>
             <Grid2 size={4}>
-
+                <DatePicker
+                    label={firstAnnouncementDateLabel}
+                    value={firstAnnouncementDateValue}
+                    views={['year', 'month', 'day']} // Only show year and month views
+                    maxDate={dayjs(new Date())}
+                    onChange={(newValue) => handleFirstDateChange('firstAnnouncementDate', newValue)}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            name="firstAnnouncementDate" // Assign a name to the field
+                            fullWidth
+                        />
+                    )}
+                />
             </Grid2>
             <Grid2 size={4}>
-
+                <DatePicker
+                    label="Preorder Date"
+                    value={preOrderDateValue}
+                    onChange={(newValue) => handlePreOrderDateChange('preOrderDate', newValue)}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            name="preOrderDate" // Assign a name to the field
+                            fullWidth
+                        />
+                    )}
+                />
             </Grid2>
             <Grid2 size={4}>
 
