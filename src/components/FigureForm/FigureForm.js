@@ -57,6 +57,13 @@ const FigureForm = () => {
                 [fieldName]: value, // Update only the field under either distributionMXN or distributionJPY
             },
         }));
+        
+        const errorField = "distribution" + id + "_" + fieldName;
+
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [errorField]: "",
+        }));
     };
 
     const handleFormChange = (event) => {
@@ -90,6 +97,7 @@ const FigureForm = () => {
             if (error.response && error.response.data && error.response.data.validations) {
                 // handle error
                 const backendErrors = error.response.data.validations;
+                console.log(backendErrors);
 
                 setErrors((prevErrors) => ({
                     ...prevErrors,
@@ -141,14 +149,18 @@ const FigureForm = () => {
                     distributorDisabled={true}
                     currency="¥"
                     sendDataToParent={handleDataFromFigureDistributionChild}
-                    firstAnnouncementDateLabel="First Announcement Date" />
+                    firstAnnouncementDateLabel="First Announcement Date"
+                    formErrors={errors}
+                />
                 <FigureDistribution
                     label="Distribution in Mexico"
                     id="MXN"
                     distributors={distributorsData}
                     currency="$"
                     sendDataToParent={handleDataFromFigureDistributionChild}
-                    firstAnnouncementDateLabel="Confirmation Date" />
+                    firstAnnouncementDateLabel="Confirmation Date"
+                    formErrors={errors}
+                />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}

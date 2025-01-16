@@ -4,7 +4,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from "dayjs";
 import { format } from 'date-fns';
 
-const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent, firstAnnouncementDateLabel }) => {
+const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent, firstAnnouncementDateLabel, formErrors }) => {
     // State to manage the selected date
     const [firstAnnouncementDateValue, setFirstAnnouncementDateValue] = useState(null);
     // State to manage the selected date
@@ -18,6 +18,11 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
     // State to manage the basePrice input
     const [basePriceValue, setBasePriceValue] = useState('');
 
+
+    const basePriceErrorField = "distribution" + id + "_basePrice";
+    const preOrderDateErrorField = "distribution" + id + "_preOrderDate";
+    const releaseDateErrorField = "distribution" + id + "_releaseDate";
+    
     const handleFirstDateChange = (fieldName, fieldValue) => {
         try {
             const formatted = format(fieldValue, 'yyyy-MM-dd');
@@ -132,7 +137,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                 </FormControl>
             </Grid2>
             <Grid2 size={6}>
-                <FormControl size="small" fullWidth>
+                <FormControl size="small" error={Boolean(formErrors[basePriceErrorField])} fullWidth>
                     <InputLabel htmlFor="basePrice-label">Base Price</InputLabel>
                     <OutlinedInput
                         id="basePrice-label"
@@ -142,6 +147,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                         value={basePriceValue}
                         onChange={handleChange}
                     />
+                    <FormHelperText>{formErrors[basePriceErrorField]}</FormHelperText>
                 </FormControl>
             </Grid2>
             <Grid2 size={4}>
@@ -172,6 +178,12 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                             fullWidth
                         />
                     )}
+                    slotProps={{
+                        textField: {
+                            error: Boolean(formErrors[preOrderDateErrorField]),
+                            helperText: formErrors[preOrderDateErrorField],
+                        },
+                    }}
                 />
             </Grid2>
             <Grid2 size={2}>
@@ -194,6 +206,12 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                             fullWidth
                         />
                     )}
+                    slotProps={{
+                        textField: {
+                            error: Boolean(formErrors[releaseDateErrorField]),
+                            helperText: formErrors[releaseDateErrorField],
+                        },
+                    }}
                 />
             </Grid2>
         </>
