@@ -6,13 +6,13 @@ import FigureDistribution from '../FigureDistribution/FigureDistribution';
 const FigureForm = () => {
 
     // State to store the list of distributos
-    const [distributorsData, setDistributorsData] = useState([]);
+    const [distributors, setDistributors] = useState([]);
     // State to handle the form information
     const [formData, setFormData] = useState({
         baseName: "",
     });
     // State to handle errors
-    const [errors, setErrors] = useState({
+    const [formErrors, setFormErrors] = useState({
         baseName: "",
     });
     // State to handle loading state
@@ -22,7 +22,7 @@ const FigureForm = () => {
     useEffect(() => {
         axiosInstance.get('/distributors')
             .then(function (response) {
-                setDistributorsData(response.data);  // Assume response.data is an array of objects
+                setDistributors(response.data);  // Assume response.data is an array of objects
             }).catch(function (error) {
                 // If the error is a validation error from backend
                 if (error.response && error.response.data) {
@@ -57,16 +57,16 @@ const FigureForm = () => {
                 [fieldName]: value, // Update only the field under either distributionMXN or distributionJPY
             },
         }));
-        
+
         const errorField = "distribution" + id + "_" + fieldName;
 
-        setErrors((prevErrors) => ({
+        setFormErrors((prevErrors) => ({
             ...prevErrors,
             [errorField]: "",
         }));
     };
 
-    const handleFormChange = (event) => {
+    const handleFormOnChange = (event) => {
         const { name, value } = event.target;
         console.log("Name: " + name);
         console.log("Value: " + value);
@@ -75,7 +75,7 @@ const FigureForm = () => {
             ...formData,
             [name]: value
         });
-        setErrors((prevErrors) => ({
+        setFormErrors((prevErrors) => ({
             ...prevErrors,
             [name]: "",
         }));
@@ -99,7 +99,7 @@ const FigureForm = () => {
                 const backendErrors = error.response.data.validations;
                 console.log(backendErrors);
 
-                setErrors((prevErrors) => ({
+                setFormErrors((prevErrors) => ({
                     ...prevErrors,
                     ...backendErrors, // Merge the backend errors into the state
                 }));
@@ -110,7 +110,7 @@ const FigureForm = () => {
         }).finally(function () {
             setLoading(false);
         });
-    }
+    };
 
     return (
         <Box
@@ -136,30 +136,31 @@ const FigureForm = () => {
                         label="Base Name"
                         name="baseName"
                         value={formData.baseName}
-                        error={Boolean(errors.baseName)}
-                        helperText={errors.baseName}
-                        onChange={handleFormChange}
+                        error={Boolean(formErrors.baseName)}
+                        helperText={formErrors.baseName}
+                        onChange={handleFormOnChange}
                         size="small"
-                        fullWidth />
+                        fullWidth
+                    />
                 </Grid2>
                 <FigureDistribution
-                    label="Distribution in Japan"
                     id="JPY"
-                    distributors={distributorsData}
-                    distributorDisabled={true}
-                    currency="¥"
-                    sendDataToParent={handleDataFromFigureDistributionChild}
+                    label="Distribution in Japan"
+                    distributors={distributors}
+                    distributorsDisabled
+                    priceCurrencySymbol="¥"
                     firstAnnouncementDateLabel="First Announcement Date"
-                    formErrors={errors}
+                    formErrors={formErrors}
+                    sendDataToParent={handleDataFromFigureDistributionChild}
                 />
                 <FigureDistribution
-                    label="Distribution in Mexico"
                     id="MXN"
-                    distributors={distributorsData}
-                    currency="$"
-                    sendDataToParent={handleDataFromFigureDistributionChild}
+                    label="Distribution in Mexico"
+                    distributors={distributors}
+                    priceCurrencySymbol="$"
                     firstAnnouncementDateLabel="Confirmation Date"
-                    formErrors={errors}
+                    formErrors={formErrors}
+                    sendDataToParent={handleDataFromFigureDistributionChild}
                 />
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
