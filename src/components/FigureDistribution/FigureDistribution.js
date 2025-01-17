@@ -1,72 +1,28 @@
-import { Divider, FormControl, FormControlLabel, FormHelperText, Grid2, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Switch, TextField } from "@mui/material";
 import { useState } from "react";
-import { DatePicker } from '@mui/x-date-pickers';
+
+import { Divider, FormControl, FormControlLabel, FormHelperText, Grid2, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Switch, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
-const FigureDistribution = ({ label, id, distributors, distributorDisabled = false, currency, sendDataToParent, firstAnnouncementDateLabel, formErrors }) => {
-    // State to manage the selected date
-    const [firstAnnouncementDateValue, setFirstAnnouncementDateValue] = useState(null);
-    // State to manage the selected date
-    const [preOrderDateValue, setPreOrderDateValue] = useState(null);
-    // State to manage the selected date
-    const [releaseDateValue, setReleaseDateValue] = useState(null);
-    const [checked, setChecked] = useState(false);
-
-    // State to manage the selected option
+const FigureDistribution = ({ id, label, distributors, distributorsDisabled = false, priceCurrencySymbol, firstAnnouncementDateLabel, formErrors, sendDataToParent }) => {
     const [selectedOption, setSelectedOption] = useState('');
-    // State to manage the basePrice input
     const [basePriceValue, setBasePriceValue] = useState('');
-
+    const [firstAnnouncementDateValue, setFirstAnnouncementDateValue] = useState(null);
+    const [preOrderDateValue, setPreOrderDateValue] = useState(null);
+    const [checked, setChecked] = useState(false);
+    const [releaseDateValue, setReleaseDateValue] = useState(null);
 
     const basePriceErrorField = "distribution" + id + "_basePrice";
     const preOrderDateErrorField = "distribution" + id + "_preOrderDate";
     const releaseDateErrorField = "distribution" + id + "_releaseDate";
-    
-    const handleFirstDateChange = (fieldName, fieldValue) => {
-        try {
-            const formatted = format(fieldValue, 'yyyy-MM-dd');
-            sendDataToParent(id, fieldName, formatted);
-        } catch (error) {
-            sendDataToParent(id, fieldName, null);
-        }
 
-        setFirstAnnouncementDateValue(fieldValue);
-    };
-
-    const handlePreOrderDateChange = (fieldName, fieldValue) => {
-        try {
-            const formatted = format(fieldValue, 'yyyy-MM-dd');
-            sendDataToParent(id, fieldName, formatted);
-        } catch (error) {
-            sendDataToParent(id, fieldName, null);
-        }
-
-        setPreOrderDateValue(fieldValue);
-    };
-
-    const handleReleaseDateChange = (fieldName, fieldValue) => {
-        try {
-            const formatted = format(fieldValue, 'yyyy-MM-dd');
-            sendDataToParent(id, fieldName, formatted);
-        } catch (error) {
-            sendDataToParent(id, fieldName, null);
-        }
-
-        setReleaseDateValue(fieldValue);
-    };
-
-    const handleReleaseDateConfirmationChange = (event) => {
-        console.log(event.target.checked);
-        setChecked(event.target.checked);
-    };
-
-    const handleSelectChange = (event) => {
+    const handleDistriibutorSelectOnChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
 
         if (fieldValue === "") {
-            sendDataToParent(id, null); // no JSON object is sent to parent
+            sendDataToParent(id, fieldName, null); // no JSON object is sent to parent
         } else {
             const index = fieldValue.indexOf("|");
             const value = fieldValue.substring(0, index);
@@ -81,8 +37,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
         }
         setSelectedOption(fieldValue);
     };
-
-    const handleChange = (event) => {
+    const handleBasePriceOnChange = (event) => {
         const fieldName = event.target.name;
         const inputValue = event.target.value;
 
@@ -106,7 +61,45 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
         } else {
             setBasePriceValue(value);
         }
-    }
+    };
+
+    const handleFirstDateOnChange = (fieldName, fieldValue) => {
+        try {
+            const formatted = format(fieldValue, 'yyyy-MM-dd');
+            sendDataToParent(id, fieldName, formatted);
+        } catch (error) {
+            sendDataToParent(id, fieldName, null);
+        }
+
+        setFirstAnnouncementDateValue(fieldValue);
+    };
+
+    const handlePreOrderDateOnChange = (fieldName, fieldValue) => {
+        try {
+            const formatted = format(fieldValue, 'yyyy-MM-dd');
+            sendDataToParent(id, fieldName, formatted);
+        } catch (error) {
+            sendDataToParent(id, fieldName, null);
+        }
+
+        setPreOrderDateValue(fieldValue);
+    };
+
+    const handleReleaseDateConfirmationChange = (event) => {
+        console.log(event.target.checked);
+        setChecked(event.target.checked);
+    };
+
+    const handleReleaseDateOnChange = (fieldName, fieldValue) => {
+        try {
+            const formatted = format(fieldValue, 'yyyy-MM-dd');
+            sendDataToParent(id, fieldName, formatted);
+        } catch (error) {
+            sendDataToParent(id, fieldName, null);
+        }
+
+        setReleaseDateValue(fieldValue);
+    };
 
     return (
         <>
@@ -114,14 +107,14 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                 <Divider>{label}</Divider>
             </Grid2>
             <Grid2 size={6}>
-                <FormControl size="small" disabled={distributorDisabled} fullWidth variant="outlined">
+                <FormControl size="small" disabled={distributorsDisabled} fullWidth variant="outlined">
                     <InputLabel id="distributor-label">Distributor</InputLabel>
                     <Select
                         labelId="distributor-label"
                         label="Distributor"
                         name="distributor"
                         value={selectedOption}
-                        onChange={handleSelectChange}
+                        onChange={handleDistriibutorSelectOnChange}
                     >
                         {/* Render the MenuItem components based on the fetched data */}
                         <MenuItem value="">
@@ -141,11 +134,11 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                     <InputLabel htmlFor="basePrice-label">Base Price</InputLabel>
                     <OutlinedInput
                         id="basePrice-label"
-                        startAdornment={<InputAdornment position="start">{currency}</InputAdornment>}
+                        startAdornment={<InputAdornment position="start">{priceCurrencySymbol}</InputAdornment>}
                         label="Base Price"
                         name="basePrice"
                         value={basePriceValue}
-                        onChange={handleChange}
+                        onChange={handleBasePriceOnChange}
                     />
                     <FormHelperText>{formErrors[basePriceErrorField]}</FormHelperText>
                 </FormControl>
@@ -156,7 +149,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                     value={firstAnnouncementDateValue}
                     views={['year', 'month', 'day']} // Only show year and month views
                     maxDate={dayjs(new Date())}
-                    onChange={(newValue) => handleFirstDateChange('firstAnnouncementDate', newValue)}
+                    onChange={(newValue) => handleFirstDateOnChange('firstAnnouncementDate', newValue)}
                     textField={(params) => (
                         <TextField
                             {...params}
@@ -170,7 +163,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                 <DatePicker
                     label="Preorder Date"
                     value={preOrderDateValue}
-                    onChange={(newValue) => handlePreOrderDateChange('preOrderDate', newValue)}
+                    onChange={(newValue) => handlePreOrderDateOnChange('preOrderDate', newValue)}
                     textField={(params) => (
                         <TextField
                             {...params}
@@ -198,7 +191,7 @@ const FigureDistribution = ({ label, id, distributors, distributorDisabled = fal
                     label="Release Date"
                     value={releaseDateValue}
                     views={checked ? ['year', 'month', 'day'] : ['year', 'month']}
-                    onChange={(newValue) => handleReleaseDateChange('releaseDate', newValue)}
+                    onChange={(newValue) => handleReleaseDateOnChange('releaseDate', newValue)}
                     textField={(params) => (
                         <TextField
                             {...params}
