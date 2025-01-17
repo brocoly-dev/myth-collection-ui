@@ -164,6 +164,18 @@ const FigureForm = () => {
                     formErrors={formErrors}
                     sendDataToParent={handleDataFromFigureDistributionChild}
                 />
+                <Grid2 size={6}>
+                    <TextField
+                        label="Tamashii Url"
+                        name="tamashiiUrl"
+                        value={formData.tamashiiUrl}
+                        error={Boolean(formErrors.tamashiiUrl)}
+                        helperText={formErrors.tamashiiUrl}
+                        onChange={handleFormOnChange}
+                        size="small"
+                        fullWidth
+                    />
+                </Grid2>
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
                         {loading ? "Submitting..." : "Submit"}
