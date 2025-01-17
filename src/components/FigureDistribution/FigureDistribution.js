@@ -73,8 +73,12 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
         setPreOrderDateValue(fieldValue);
     };
 
-    const handleReleaseDateConfirmationChange = (event) => {
-        console.log(event.target.checked);
+    const handleReleaseDateConfirmationOnChange = (event) => {
+        const fieldName = event.target.name;
+        const inputValue = event.target.checked;
+
+        sendDataToParent(id, fieldName, inputValue);
+
         setChecked(event.target.checked);
     };
 
@@ -172,8 +176,9 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
             </Grid2>
             <Grid2 size={2}>
                 <FormControlLabel
-                    control={<Switch checked={checked} onChange={handleReleaseDateConfirmationChange} />}
+                    control={<Switch checked={checked} onChange={handleReleaseDateConfirmationOnChange} />}
                     label="Confirm Day?"
+                    name="releaseDateConfirmed"
                     labelPlacement="end"
                 />
             </Grid2>

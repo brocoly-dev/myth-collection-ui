@@ -46,7 +46,9 @@ const FigureForm = () => {
         if (!(distribution in formData)) {
             setFormData((prevFormData) => ({
                 ...prevFormData,
-                [distribution]: {} // creates the distributionMXN or distributionJPY empty structure.
+                [distribution]: {
+                    releaseDateConfirmed: false
+                } // creates the distributionMXN or distributionJPY empty structure and some default values.
             }));
         }
 
