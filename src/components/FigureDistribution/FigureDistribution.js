@@ -64,24 +64,12 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
     };
 
     const handleFirstDateOnChange = (fieldName, fieldValue) => {
-        try {
-            const formatted = format(fieldValue, 'yyyy-MM-dd');
-            sendDataToParent(id, fieldName, formatted);
-        } catch (error) {
-            sendDataToParent(id, fieldName, null);
-        }
-
+        formatDateAndSendToParent(fieldName, fieldValue);
         setFirstAnnouncementDateValue(fieldValue);
     };
 
     const handlePreOrderDateOnChange = (fieldName, fieldValue) => {
-        try {
-            const formatted = format(fieldValue, 'yyyy-MM-dd');
-            sendDataToParent(id, fieldName, formatted);
-        } catch (error) {
-            sendDataToParent(id, fieldName, null);
-        }
-
+        formatDateAndSendToParent(fieldName, fieldValue);
         setPreOrderDateValue(fieldValue);
     };
 
@@ -91,14 +79,17 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
     };
 
     const handleReleaseDateOnChange = (fieldName, fieldValue) => {
+        formatDateAndSendToParent(fieldName, fieldValue);
+        setReleaseDateValue(fieldValue);
+    };
+
+    const formatDateAndSendToParent = (fieldName, fieldValue) => {
         try {
             const formatted = format(fieldValue, 'yyyy-MM-dd');
             sendDataToParent(id, fieldName, formatted);
         } catch (error) {
             sendDataToParent(id, fieldName, null);
         }
-
-        setReleaseDateValue(fieldValue);
     };
 
     return (
