@@ -1,5 +1,5 @@
 import axiosInstance from './axiosValidationInterceptor'
-import { Box, Button, Grid2, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FigureDistribution from '../FigureDistribution/FigureDistribution';
 
@@ -7,6 +7,9 @@ const FigureForm = () => {
 
     // State to store the list of distributos
     const [distributors, setDistributors] = useState([]);
+    const [distributionChannel, setDistributionChannel] = useState([]);
+    const [selectedOption, setSelectedOption] = useState('');
+
     // State to handle the form information
     const [formData, setFormData] = useState({
         baseName: "",
@@ -32,6 +35,20 @@ const FigureForm = () => {
                 } else {
                     // Handle other errors (e.g., network issues)
                     console.error("Error getting the distributors", error);
+                }
+            });
+        axiosInstance.get('/distribution-channels')
+            .then(function (response) {
+                setDistributionChannel(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the distribution channel", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the distribution channel", error);
                 }
             });
     }, []); // Empty dependency array means this runs once when the component mounts
@@ -67,7 +84,26 @@ const FigureForm = () => {
             [errorField]: "",
         }));
     };
+    const handleDistributionChannelSelectOnChange = (event) => {
+        const fieldName = event.target.name;
+        const fieldValue = event.target.value;
 
+        if (fieldValue === "") {
+            
+        } else {
+            const index = fieldValue.indexOf("|");
+            const value = fieldValue.substring(0, index);
+            const text = fieldValue.substring(index + 1);
+
+            const jsonObject = {
+                id: value,
+                name: text
+            };
+
+            
+        }
+        setSelectedOption(fieldValue);
+    };
     const handleFormOnChange = (event) => {
         const { name, value } = event.target;
         console.log("Name: " + name);
@@ -175,6 +211,29 @@ const FigureForm = () => {
                         size="small"
                         fullWidth
                     />
+                </Grid2>
+                <Grid2 size={6}>
+                    <FormControl size="small" fullWidth variant="outlined">
+                        <InputLabel id="distribution-channel-label">Distribution Channel</InputLabel>
+                        <Select
+                            labelId="distribution-channel-label"
+                            label="Distribution Channel"
+                            name="distributionChannel"
+                            value={selectedOption}
+                            onChange={handleDistributionChannelSelectOnChange}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {distributionChannel.map((item) => (
+                                <MenuItem key={item.id} value={item.id + '|' + item.distribution}>
+                                    {item.distribution}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
                 </Grid2>
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>

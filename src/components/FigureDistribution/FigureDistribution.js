@@ -17,7 +17,7 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
     const preOrderDateErrorField = "distribution" + id + "_preOrderDate";
     const releaseDateErrorField = "distribution" + id + "_releaseDate";
 
-    const handleDistriibutorSelectOnChange = (event) => {
+    const handleDistributorSelectOnChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
 
@@ -109,7 +109,7 @@ const FigureDistribution = ({ id, label, distributors, distributorsDisabled = fa
                         label="Distributor"
                         name="distributor"
                         value={selectedOption}
-                        onChange={handleDistriibutorSelectOnChange}
+                        onChange={handleDistributorSelectOnChange}
                     >
                         {/* Render the MenuItem components based on the fetched data */}
                         <MenuItem value="">
