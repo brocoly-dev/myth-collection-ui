@@ -7,8 +7,12 @@ const FigureForm = () => {
 
     // State to store the list of distributos
     const [distributors, setDistributors] = useState([]);
+
     const [distributionChannel, setDistributionChannel] = useState([]);
-    const [selectedOption, setSelectedOption] = useState('');
+    const [distributionChannelSelectedOption, setDistributionChannelSelectedOption] = useState('');
+
+    const [lineups, setLineups] = useState([]);
+    const [lineUpSelectedOption, setLineUpSelectedOption] = useState('');
 
     // State to handle the form information
     const [formData, setFormData] = useState({
@@ -51,6 +55,20 @@ const FigureForm = () => {
                     console.error("Error getting the distribution channel", error);
                 }
             });
+        axiosInstance.get('/lineups')
+            .then(function (response) {
+                setLineups(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the lineUps", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the linesUps", error);
+                }
+            });
     }, []); // Empty dependency array means this runs once when the component mounts
 
     // Function to handle data received from the child
@@ -84,12 +102,16 @@ const FigureForm = () => {
             [errorField]: "",
         }));
     };
+
     const handleDistributionChannelSelectOnChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
 
         if (fieldValue === "") {
-            
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [fieldName]: null
+            }));
         } else {
             const index = fieldValue.indexOf("|");
             const value = fieldValue.substring(0, index);
@@ -97,13 +119,38 @@ const FigureForm = () => {
 
             const jsonObject = {
                 id: value,
-                name: text
+                distribution: text
             };
 
-            
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [fieldName]: jsonObject
+            }));
         }
-        setSelectedOption(fieldValue);
+        setDistributionChannelSelectedOption(fieldValue);
     };
+
+    const handleLineUpSelectOnChange = (event) => {
+        const fieldName = event.target.name;
+        const fieldValue = event.target.value;
+
+        if (fieldValue === "") {
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [fieldName]: null
+            }));
+        } else {
+            const index = fieldValue.indexOf("|");
+            const value = fieldValue.substring(0, index);
+
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                [fieldName]: value
+            }));
+        }
+        setLineUpSelectedOption(fieldValue);
+    };
+
     const handleFormOnChange = (event) => {
         const { name, value } = event.target;
         console.log("Name: " + name);
@@ -200,7 +247,7 @@ const FigureForm = () => {
                     formErrors={formErrors}
                     sendDataToParent={handleDataFromFigureDistributionChild}
                 />
-                <Grid2 size={6}>
+                <Grid2 size={4}>
                     <TextField
                         label="Tamashii Url"
                         name="tamashiiUrl"
@@ -212,14 +259,14 @@ const FigureForm = () => {
                         fullWidth
                     />
                 </Grid2>
-                <Grid2 size={6}>
+                <Grid2 size={4}>
                     <FormControl size="small" fullWidth variant="outlined">
                         <InputLabel id="distribution-channel-label">Distribution Channel</InputLabel>
                         <Select
                             labelId="distribution-channel-label"
                             label="Distribution Channel"
                             name="distributionChannel"
-                            value={selectedOption}
+                            value={distributionChannelSelectedOption}
                             onChange={handleDistributionChannelSelectOnChange}
                         >
                             {/* Render the MenuItem components based on the fetched data */}
@@ -229,6 +276,29 @@ const FigureForm = () => {
                             {distributionChannel.map((item) => (
                                 <MenuItem key={item.id} value={item.id + '|' + item.distribution}>
                                     {item.distribution}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl size="small" fullWidth variant="outlined">
+                        <InputLabel id="lune-up-label">Line Up</InputLabel>
+                        <Select
+                            labelId="lune-up-label"
+                            label="Line Up"
+                            name="lineUp"
+                            value={lineUpSelectedOption}
+                            onChange={handleLineUpSelectOnChange}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {lineups.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
                                 </MenuItem>
                             ))}
                         </Select>
