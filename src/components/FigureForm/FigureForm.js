@@ -14,6 +14,12 @@ const FigureForm = () => {
     const [lineups, setLineups] = useState([]);
     const [lineUpSelectedOption, setLineUpSelectedOption] = useState('');
 
+    const [series, setSeries] = useState([]);
+    const [seriesSelectedOption, setSeriesSelectedOption] = useState('');
+
+    const [categories, setCategories] = useState([]);
+    const [categorySelectedOption, setCategorySelectedOption] = useState('');
+
     // State to handle the form information
     const [formData, setFormData] = useState({
         baseName: "",
@@ -67,6 +73,34 @@ const FigureForm = () => {
                 } else {
                     // Handle other errors (e.g., network issues)
                     console.error("Error getting the linesUps", error);
+                }
+            });
+        axiosInstance.get('/series')
+            .then(function (response) {
+                setSeries(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the series", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the series", error);
+                }
+            });
+        axiosInstance.get('/categories')
+            .then(function (response) {
+                setCategories(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the categories", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the categories", error);
                 }
             });
     }, []); // Empty dependency array means this runs once when the component mounts
@@ -131,6 +165,21 @@ const FigureForm = () => {
     };
 
     const handleLineUpSelectOnChange = (event) => {
+        handleSimpleCatalogSelectOnChange(event);
+        setLineUpSelectedOption(event.target.value);
+    };
+
+    const handleSeriesSelectOnChange = (event) => {
+        handleSimpleCatalogSelectOnChange(event);
+        setSeriesSelectedOption(event.target.value);
+    };
+
+    const handleCategorySelectOnChange = (event) => {
+        handleSimpleCatalogSelectOnChange(event);
+        setCategorySelectedOption(event.target.value);
+    };
+
+    const handleSimpleCatalogSelectOnChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
 
@@ -148,7 +197,6 @@ const FigureForm = () => {
                 [fieldName]: value
             }));
         }
-        setLineUpSelectedOption(fieldValue);
     };
 
     const handleFormOnChange = (event) => {
@@ -297,6 +345,52 @@ const FigureForm = () => {
                                 <em>None</em>
                             </MenuItem>
                             {lineups.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl size="small" fullWidth variant="outlined">
+                        <InputLabel id="series-label">Series</InputLabel>
+                        <Select
+                            labelId="series-label"
+                            label="Series"
+                            name="series"
+                            value={seriesSelectedOption}
+                            onChange={handleSeriesSelectOnChange}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {series.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl size="small" fullWidth variant="outlined">
+                        <InputLabel id="category-label">Category</InputLabel>
+                        <Select
+                            labelId="category-label"
+                            label="Category"
+                            name="category"
+                            value={categorySelectedOption}
+                            onChange={handleCategorySelectOnChange}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {categories.map((item) => (
                                 <MenuItem key={item.key} value={item.key + '|' + item.description}>
                                     {item.description}  {/* Display the item name, adjust to match your object structure */}
                                 </MenuItem>
