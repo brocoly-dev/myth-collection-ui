@@ -1,5 +1,5 @@
 import axiosInstance from './axiosValidationInterceptor'
-import { Box, Button, FormControl, FormHelperText, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Grid2, InputLabel, MenuItem, Select, Switch, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FigureDistribution from '../FigureDistribution/FigureDistribution';
 
@@ -19,6 +19,34 @@ const FigureForm = () => {
 
     const [categories, setCategories] = useState([]);
     const [categorySelectedOption, setCategorySelectedOption] = useState('');
+
+    const [revivalChecked, setRevivalChecked] = useState(false);
+    const [oceChecked, setOceChecked] = useState(false);
+    const [metalChecked, setMetalChecked] = useState(false);
+    const [goldenChecked, setGoldenChecked] = useState(false);
+    const [goldChecked, setGoldChecked] = useState(false);
+    const [surpliceChecked, setSurpliceChecked] = useState(false);
+    const [brokenChecked, setBrokenChecked] = useState(false);
+    const [plainChecked, setPlainChecked] = useState(false);
+    const [hkChecked, setHkChecked] = useState(false);
+    const [comicChecked, setComicChecked] = useState(false);
+    const [setChecked, setSetChecked] = useState(false);
+
+
+    // Mapping setter functions
+    const setters = {
+        revival: setRevivalChecked,
+        oce: setOceChecked,
+        metal: setMetalChecked,
+        golden: setGoldenChecked,
+        gold: setGoldChecked,
+        surplice: setSurpliceChecked,
+        broken: setBrokenChecked,
+        plain: setPlainChecked,
+        hk: setHkChecked,
+        comic: setComicChecked,
+        set: setSetChecked
+    };
 
     // State to handle the form information
     const [formData, setFormData] = useState({
@@ -199,6 +227,21 @@ const FigureForm = () => {
         }
     };
 
+    const handleSwitchOnChange = (event) => {
+        const fieldName = event.target.name;
+        const inputValue = event.target.checked;
+
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [fieldName]: inputValue
+        }));
+
+        // Dynamically call the setter based on field
+        if (setters[fieldName]) {
+            setters[fieldName](inputValue);
+        }
+    };
+
     const handleFormOnChange = (event) => {
         const { name, value } = event.target;
         console.log("Name: " + name);
@@ -353,7 +396,7 @@ const FigureForm = () => {
                         <FormHelperText>Choose an option</FormHelperText>
                     </FormControl>
                 </Grid2>
-                <Grid2 size={4}>
+                <Grid2 size={6}>
                     <FormControl size="small" fullWidth variant="outlined">
                         <InputLabel id="series-label">Series</InputLabel>
                         <Select
@@ -376,7 +419,7 @@ const FigureForm = () => {
                         <FormHelperText>Choose an option</FormHelperText>
                     </FormControl>
                 </Grid2>
-                <Grid2 size={4}>
+                <Grid2 size={6}>
                     <FormControl size="small" fullWidth variant="outlined">
                         <InputLabel id="category-label">Category</InputLabel>
                         <Select
@@ -397,6 +440,93 @@ const FigureForm = () => {
                             ))}
                         </Select>
                         <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl component="fieldset" variant="standard">
+                        <FormLabel component="legend">Main Attributes</FormLabel>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={<Switch checked={revivalChecked} onChange={handleSwitchOnChange} />}
+                                label="Revival Edition"
+                                name="revival"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={oceChecked} onChange={handleSwitchOnChange} />}
+                                label="Original Color Edition"
+                                name="oce"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={metalChecked} onChange={handleSwitchOnChange} />}
+                                label="Metal Body"
+                                name="metal"
+                                labelPlacement="end"
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl component="fieldset" variant="standard">
+                        <FormLabel component="legend">Armor Attributes</FormLabel>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={<Switch checked={goldenChecked} onChange={handleSwitchOnChange} />}
+                                label="Golden Edition"
+                                name="golden"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={goldChecked} onChange={handleSwitchOnChange} />}
+                                label="Gold Armor"
+                                name="gold"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={surpliceChecked} onChange={handleSwitchOnChange} />}
+                                label="Surplice Armor"
+                                name="surplice"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={brokenChecked} onChange={handleSwitchOnChange} />}
+                                label="Broken Armor"
+                                name="broken"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={plainChecked} onChange={handleSwitchOnChange} />}
+                                label="Plain Cloth"
+                                name="plain"
+                                labelPlacement="end"
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={4}>
+                    <FormControl component="fieldset" variant="standard">
+                        <FormLabel component="legend">Other Attributes</FormLabel>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={<Switch checked={hkChecked} onChange={handleSwitchOnChange} />}
+                                label="HK Version"
+                                name="hk"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={comicChecked} onChange={handleSwitchOnChange} />}
+                                label="Comic Version"
+                                name="comic"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                control={<Switch checked={setChecked} onChange={handleSwitchOnChange} />}
+                                label="Set"
+                                name="set"
+                                labelPlacement="end"
+                            />
+                        </FormGroup>
                     </FormControl>
                 </Grid2>
                 <Grid2 size={4}>
