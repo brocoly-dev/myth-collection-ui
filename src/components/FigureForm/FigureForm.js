@@ -20,6 +20,9 @@ const FigureForm = () => {
     const [categories, setCategories] = useState([]);
     const [categorySelectedOption, setCategorySelectedOption] = useState('');
 
+    const [anniversaries, setAnniversaries] = useState([]);
+    const [anniversarySelectedOption, setAnniversarySelectedOption] = useState('');
+
     const [revivalChecked, setRevivalChecked] = useState(false);
     const [oceChecked, setOceChecked] = useState(false);
     const [metalChecked, setMetalChecked] = useState(false);
@@ -31,7 +34,6 @@ const FigureForm = () => {
     const [hkChecked, setHkChecked] = useState(false);
     const [comicChecked, setComicChecked] = useState(false);
     const [setChecked, setSetChecked] = useState(false);
-
 
     // Mapping setter functions
     const setters = {
@@ -131,6 +133,21 @@ const FigureForm = () => {
                     console.error("Error getting the categories", error);
                 }
             });
+
+        axiosInstance.get('/anniversaries')
+            .then(function (response) {
+                setAnniversaries(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the anniversaries", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the anniversaries", error);
+                }
+            });
     }, []); // Empty dependency array means this runs once when the component mounts
 
     // Function to handle data received from the child
@@ -207,6 +224,11 @@ const FigureForm = () => {
         setCategorySelectedOption(event.target.value);
     };
 
+    const handleAnniversarySelectOnChange = (event) => {
+        handleSimpleCatalogSelectOnChange(event);
+        setAnniversarySelectedOption(event.target.value);
+    };
+
     const handleSimpleCatalogSelectOnChange = (event) => {
         const fieldName = event.target.name;
         const fieldValue = event.target.value;
@@ -244,9 +266,6 @@ const FigureForm = () => {
 
     const handleFormOnChange = (event) => {
         const { name, value } = event.target;
-        console.log("Name: " + name);
-        console.log("Value: " + value);
-
         setFormData({
             ...formData,
             [name]: value
@@ -528,6 +547,37 @@ const FigureForm = () => {
                             />
                         </FormGroup>
                     </FormControl>
+                    <FormControl size="small" variant="outlined">
+                        <InputLabel id="anniversary-label">Anniversary</InputLabel>
+                        <Select
+                            labelId="anniversary-label"
+                            label="Anniversary"
+                            name="anniversary"
+                            value={anniversarySelectedOption}
+                            onChange={handleAnniversarySelectOnChange}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            {anniversaries.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>Choose an option</FormHelperText>
+                    </FormControl>
+                </Grid2>
+                <Grid2 size={12}>
+                    <TextField
+                        label="Additional Information"
+                        name="remarks"
+                        onChange={handleFormOnChange}
+                        size="small"
+                        multiline
+                        fullWidth
+                    />
                 </Grid2>
                 <Grid2 size={4}>
                     <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
