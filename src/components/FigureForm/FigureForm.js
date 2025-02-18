@@ -28,7 +28,6 @@ const FigureForm = () => {
     const [metalChecked, setMetalChecked] = useState(false);
     const [goldenChecked, setGoldenChecked] = useState(false);
     const [goldChecked, setGoldChecked] = useState(false);
-    const [surpliceChecked, setSurpliceChecked] = useState(false);
     const [brokenChecked, setBrokenChecked] = useState(false);
     const [plainChecked, setPlainChecked] = useState(false);
     const [hkChecked, setHkChecked] = useState(false);
@@ -42,7 +41,6 @@ const FigureForm = () => {
         metal: setMetalChecked,
         golden: setGoldenChecked,
         gold: setGoldChecked,
-        surplice: setSurpliceChecked,
         broken: setBrokenChecked,
         plain: setPlainChecked,
         hk: setHkChecked,
@@ -500,12 +498,6 @@ const FigureForm = () => {
                                 control={<Switch checked={goldChecked} onChange={handleSwitchOnChange} />}
                                 label="Gold Armor"
                                 name="gold"
-                                labelPlacement="end"
-                            />
-                            <FormControlLabel
-                                control={<Switch checked={surpliceChecked} onChange={handleSwitchOnChange} />}
-                                label="Surplice Armor"
-                                name="surplice"
                                 labelPlacement="end"
                             />
                             <FormControlLabel
