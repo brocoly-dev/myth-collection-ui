@@ -21,10 +21,9 @@ const FigureForm = () => {
       <Grid2 container spacing={2}>
         {rows.map((row) => (
           <Grid2 key={row.id}>
-            <Card sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Card sx={{ maxWidth: 345, flexDirection: 'column' }}>
               <CardMedia
                 component="img"
-                height="140"
                 image={row.imageUrl}
                 alt={row.name}
               />
@@ -36,6 +35,9 @@ const FigureForm = () => {
                   Age: {row.age}
                 </Typography>
               </CardContent>
+              <CardActions>
+                <Button size="small">Learn More</Button>
+              </CardActions>
             </Card>
           </Grid2>
         ))}

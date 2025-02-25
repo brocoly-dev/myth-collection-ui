@@ -1,4 +1,4 @@
-import { Card, CardContent, CardMedia, Grid2, Typography, Paper } from '@mui/material';
+import { Card, CardContent, CardMedia, Grid2, Typography, Paper, CardActions, Button, CardActionArea, Tooltip } from '@mui/material';
 import axiosInstance from '../FigureForm/axiosValidationInterceptor'
 import { useEffect, useState } from "react";
 
@@ -29,26 +29,33 @@ const FigureManagement = () => {
             <Grid2 container spacing={2}>
                 {figurines.map((figurine) => (
                     <Grid2 key={figurine.id}>
-                        <Card sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <CardMedia
-                                component="img"
-                                height="140"
-                                image={figurine.officialImages ? figurine.officialImages[0] : "-"}
-                                alt={figurine.displayableName}
-                            />
-                            <CardContent>
-                                <Typography variant="h6" component="div">
-                                    {figurine.displayableName}
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary">
-                                    {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
-                                        "Release Date: " + (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {figurine.status === "RELEASE_TBD" ? "Release Date: To be Determined" :
-                                        (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "Price: " + (formatAmount(figurine.distributionJPY.finalPrice)) : "Announcement Date: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
-                                </Typography>
-                            </CardContent>
+                        <Card sx={{ width: 300, height: 550, flexDirection: 'column' }}>
+                            <CardActionArea>
+                                <Tooltip title={figurine.displayableName} arrow>
+                                    <CardMedia
+                                        component="img"
+                                        image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                        alt={figurine.displayableName}
+                                        title={figurine.displayableName}
+                                    />
+                                    <CardContent sx={{ textAlign: "left" }}>
+                                        <Typography gutterBottom variant="body1" component="div">
+                                            <b>{showDisplayableName(figurine.displayableName)}</b>
+                                        </Typography>
+                                        <Typography variant="subtitle2" color="text.secondary">
+                                            {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
+                                                (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
+                                        </Typography>
+                                        <Typography variant="subtitle2" color="text.secondary">
+                                            {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
+                                                (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
+                                        </Typography>
+                                    </CardContent>
+                                </Tooltip>
+                            </CardActionArea>
+                            <CardActions disableSpacing>
+                                <Button size="small">View More</Button>
+                            </CardActions>
                         </Card>
                     </Grid2>
                 ))}
@@ -56,6 +63,13 @@ const FigureManagement = () => {
         </Paper>
     );
 };
+function showDisplayableName(name) {
+    if (name.length > 30) {
+        return name.substring(0, 27) + "...";
+    } else {
+        return name;
+    }
+}
 function formatAmount(theAmount) {
     if (theAmount) {
         return new Intl.NumberFormat("en-US", {
