@@ -1,114 +1,141 @@
-import { Card, CardContent, CardMedia, Grid2, Typography, Paper, CardActions, Button, CardActionArea, Tooltip } from '@mui/material';
-import axiosInstance from '../FigureForm/axiosValidationInterceptor'
-import { useEffect, useState } from "react";
+import * as React from 'react';
+import { extendTheme } from '@mui/material/styles';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import DescriptionIcon from '@mui/icons-material/Description';
+import LayersIcon from '@mui/icons-material/Layers';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { Box } from '@mui/material';
+import FigureListing from '../FigureListing/FigureListing';
 
-const FigureManagement = () => {
-    // State to store the list of distributos
-    const [figurines, setFigurines] = useState([]);
+const NAVIGATION = [
+    {
+        kind: 'header',
+        title: 'Main items',
+    },
+    {
+        segment: 'dashboard',
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+    },
+    {
+        segment: 'figurines',
+        title: 'All figurines',
+        icon: <ListAltIcon />,
+    },
+    {
+        kind: 'divider',
+    },
+    {
+        kind: 'header',
+        title: 'Analytics',
+    },
+    {
+        segment: 'reports',
+        title: 'Reports',
+        icon: <BarChartIcon />,
+        children: [
+            {
+                segment: 'sales',
+                title: 'Sales',
+                icon: <DescriptionIcon />,
+            },
+            {
+                segment: 'traffic',
+                title: 'Traffic',
+                icon: <DescriptionIcon />,
+            },
+        ],
+    },
+    {
+        segment: 'integrations',
+        title: 'Integrations',
+        icon: <LayersIcon />,
+    },
+];
 
-    // Fetch the data when the component mounts
-    useEffect(() => {
-        axiosInstance.get('/figurines')
-            .then(function (response) {
-                setFigurines(response.data); // Assume response.data is an array of objects
-            }).catch(function (error) {
-                // If the error is a validation error from backend
-                if (error.response && error.response.data) {
-                    // handle error
-                    const backendErrors = error.response.data;
-                    console.error("Error retrieving the figurines", backendErrors);
-                } else {
-                    // Handle other errors (e.g., network issues)
-                    console.error("Error getting the figurines", error);
-                }
-            });
-    }, []); // Empty dependency array means this runs once when the component mounts
+
+const demoTheme = extendTheme({
+    colorSchemes: { light: true, dark: true },
+    colorSchemeSelector: 'class',
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 600,
+            lg: 1200,
+            xl: 1536,
+        },
+    },
+});
+
+function useDemoRouter(initialPath) {
+    const [pathname, setPathname] = React.useState(initialPath);
+
+    const router = React.useMemo(() => {
+        return {
+            pathname,
+            searchParams: new URLSearchParams(),
+            navigate: (path) => setPathname(String(path)),
+        };
+    }, [pathname]);
+
+    return router;
+}
+
+const AdminDashboard2 = () => <h1>Welcome, User2</h1>;
+const AdminDashboard3 = () => <h1>Welcome, User3</h1>;
+
+function PageContent({ pathname }) {
+    let currentPage;
+    if (pathname === "/figurines") {
+        currentPage = <FigureListing />;
+    } else if (pathname === "/reports/sales") {
+        currentPage = <AdminDashboard2 />;
+    } else {
+        currentPage = <AdminDashboard3 />;
+    }
 
     return (
-        <Paper sx={{ padding: '16px' }}>
-            <Grid2 container spacing={2}>
-                {figurines.map((figurine) => (
-                    <Grid2 key={figurine.id}>
-                        <Card sx={{ width: 300, height: 550, flexDirection: 'column' }}>
-                            <CardActionArea>
-                                <Tooltip title={figurine.displayableName} arrow>
-                                    <CardMedia
-                                        component="img"
-                                        image={figurine.officialImages ? figurine.officialImages[0] : "-"}
-                                        alt={figurine.displayableName}
-                                        title={figurine.displayableName}
-                                    />
-                                    <CardContent sx={{ textAlign: "left" }}>
-                                        <Typography gutterBottom variant="body1" component="div">
-                                            <b>{showDisplayableName(figurine.displayableName)}</b>
-                                        </Typography>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
-                                                (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
-                                        </Typography>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
-                                                (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
-                                        </Typography>
-                                    </CardContent>
-                                </Tooltip>
-                            </CardActionArea>
-                            <CardActions disableSpacing>
-                                <Button size="small">View More</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid2>
-                ))}
-            </Grid2>
-        </Paper>
+        <Box
+            sx={{
+                py: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+            }}
+        >
+            {currentPage}
+        </Box>
     );
-};
-function showDisplayableName(name) {
-    if (name.length > 30) {
-        return name.substring(0, 27) + "...";
-    } else {
-        return name;
-    }
 }
-function formatAmount(theAmount) {
-    if (theAmount) {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "JPY",
-        }).format(theAmount);
-    } else {
-        return "Not Available";
-    }
-}
-function parseDateWithoutTimezone(dateString) {
-    const [year, month, day] = dateString.split("-").map(Number);
-    return new Date(year, month - 1, day); // Month is 0-based
-}
-function formatDateWithOrdinal(theDate, isConfirmed) {
-    const date = parseDateWithoutTimezone(theDate);
 
-    let options;
-    if (isConfirmed) {
-        options = { month: "long", day: "numeric", year: "numeric" };
-    } else {
-        options = { month: "long", year: "numeric" };
-    }
-    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
+const FigureManagement = (props) => {
 
-    if (isConfirmed) {
-        const day = date.getDate();
-        return formattedDate.replace(/\d+/, `${day}${getOrdinalSuffix(day)}`);
-    } else {
-        return formattedDate;
-    }
-}
-function getOrdinalSuffix(day) {
-    if (day >= 11 && day <= 13) return "th";
-    switch (day % 10) {
-        case 1: return "st";
-        case 2: return "nd";
-        case 3: return "rd";
-        default: return "th";
-    }
+    const { window } = props;
+
+    const router = useDemoRouter('/dashboard');
+
+    // Remove this const when copying and pasting into your project.
+    const demoWindow = window ? window() : undefined;
+
+    return (
+        <AppProvider
+            navigation={NAVIGATION}
+            router={router}
+            theme={demoTheme}
+            window={demoWindow}
+        >
+            <DashboardLayout>
+                <PageContainer>
+                    <PageContent pathname={router.pathname} />
+                </PageContainer>
+            </DashboardLayout>
+        </AppProvider>
+    );
 }
 export default FigureManagement;
