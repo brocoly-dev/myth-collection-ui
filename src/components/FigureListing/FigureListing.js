@@ -1,10 +1,15 @@
 import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Grid2, Paper, Tooltip, Typography } from '@mui/material';
 import axiosInstance from '../FigureForm/axiosValidationInterceptor'
 import { useEffect, useState } from "react";
+import FigureDetail from './FigureDetail';
 
 const FigureListing = () => {
-    // State to store the list of distributos
+    // State to store the list of figurines
     const [figurines, setFigurines] = useState([]);
+    // State to store the flag to open and hide the dialog
+    const [open, setOpen] = useState(false);
+    // State to store the slected figurine
+    const [figurineSelected, setFigurineSelected] = useState();
 
     // Fetch the data when the component mounts
     useEffect(() => {
@@ -23,44 +28,56 @@ const FigureListing = () => {
                 }
             });
     }, []); // Empty dependency array means this runs once when the component mounts
-    
+
+    const handleClickOpen = (figurine) => {
+        setOpen(true);
+        setFigurineSelected(figurine);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return (
-        <Paper sx={{ padding: '16px' }}>
-            <Grid2 container spacing={2}>
-                {figurines.map((figurine) => (
-                    <Grid2 key={figurine.id}>
-                        <Card sx={{ maxWidth: 210, flexDirection: 'column' }}>
-                            <CardActionArea>
-                                <Tooltip title={figurine.displayableName} arrow>
-                                    <CardMedia
-                                        component="img"
-                                        image={figurine.officialImages ? figurine.officialImages[0] : "-"}
-                                        alt={figurine.displayableName}
-                                        title={figurine.displayableName}
-                                    />
-                                    <CardContent sx={{ textAlign: "left" }}>
-                                        <Typography gutterBottom variant="body1" component="div">
-                                            <b>{showDisplayableName(figurine.displayableName)}</b>
-                                        </Typography>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
-                                                (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
-                                        </Typography>
-                                        <Typography variant="subtitle2" color="text.secondary">
-                                            {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
-                                                (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
-                                        </Typography>
-                                    </CardContent>
-                                </Tooltip>
-                            </CardActionArea>
-                            <CardActions disableSpacing>
-                                <Button size="small">View More</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid2>
-                ))}
-            </Grid2>
-        </Paper>
+        <>
+            <Paper sx={{ padding: '16px' }}>
+                <Grid2 container spacing={2}>
+                    {figurines.map((figurine) => (
+                        <Grid2 key={figurine.id}>
+                            <Card sx={{ maxWidth: 210, flexDirection: 'column' }}>
+                                <CardActionArea>
+                                    <Tooltip title={figurine.displayableName} arrow>
+                                        <CardMedia
+                                            component="img"
+                                            image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                            alt={figurine.displayableName}
+                                            title={figurine.displayableName}
+                                        />
+                                        <CardContent sx={{ textAlign: "left" }}>
+                                            <Typography gutterBottom variant="body1" component="div">
+                                                <b>{showDisplayableName(figurine.displayableName)}</b>
+                                            </Typography>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
+                                                    (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
+                                            </Typography>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
+                                                    (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
+                                            </Typography>
+                                        </CardContent>
+                                    </Tooltip>
+                                </CardActionArea>
+                                <CardActions disableSpacing>
+                                    <Button onClick={() => handleClickOpen(figurine)} size="small" disabled={figurine.status === "RELEASE_TBD"}>View More</Button>
+                                </CardActions>
+                            </Card>
+                        </Grid2>
+                    ))}
+                </Grid2>
+            </Paper>
+            <FigureDetail open={open} onClose={handleClose} figurine={figurineSelected} />
+        </>
     );
 };
 
