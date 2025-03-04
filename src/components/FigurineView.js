@@ -121,7 +121,6 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/2/CXHXAG.png"
-                                                alt="example"
                                                 alt="Logo"
                                                 style={{
                                                     width: '100%',
@@ -143,7 +142,6 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/4739/icWjzi.png"
-                                                alt="example"
                                                 alt="Logo"
                                                 style={{
                                                     width: '100%',
@@ -168,7 +166,6 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/2346/9VueKU.png"
-                                                alt="example"
                                                 alt="Logo"
                                                 style={{
                                                     width: '100%',
