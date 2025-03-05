@@ -1,34 +1,33 @@
+import axios from '../utils/axiosValidationInterceptor';
+import { formatAmount, formatDate } from '../utils/formatters';
 
-
-import Tab from '@mui/material/Tab';
+import { useState, useEffect } from "react";
+import { Box, Card, CardMedia, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import React from 'react';
-import { CardMedia, Card, ImageList, ImageListItem, Typography } from '@mui/material';
-
-import Divider from '@mui/material/Divider';
-
-
-
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid2';
-import Stack from '@mui/material/Stack';
 
-
-import { formatAmount, formatDate } from '../utils';
-
-
-
-
-const FigureView = () => {
-    const [value, setValue] = React.useState('1');
+const FigureView = ({ id }) => {
+    const [figurine, setFigurine] = useState();
+    const [value, setValue] = useState('1');
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get("/figurines/" + id);
+                setFigurine(response.data);
+            } catch (err) {
+                console.log("Unable to fetch figurine");
+            }
+        };
+
+        fetchData();
+    }, [id]); // Runs only when 'id' changes.
 
     function srcset(image, size, rows = 1, cols = 1) {
         return {
@@ -37,13 +36,6 @@ const FigureView = () => {
                 }&fit=crop&auto=format&dpr=2 2x`,
         };
     }
-
-    const data = [
-        { label: 'Name', value: 'John Doe' },
-        { label: 'Age', value: '30' },
-        { label: 'Email', value: 'john.doe@example.com' },
-        { label: 'Location', value: 'New York' }
-    ];
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: '#fff',
@@ -61,7 +53,7 @@ const FigureView = () => {
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleChange} aria-label="lab API tabs example">
-                        <Tab label="Detail" value="1" />
+                        <Tab label="Figurine" value="1" />
                         <Tab label="Offical Gallery" value="2" />
                         <Tab label="Personal Gallery" value="3" />
                     </TabList>
@@ -72,18 +64,18 @@ const FigureView = () => {
                             <Grid size={8}>
                                 <Card>
                                     <Box sx={{ position: 'relative' }}>
-                                        <CardMedia
-                                            sx={{
-                                                width: '100%', height: 'auto', objectFit: 'cover',
-                                                border: '3px solid rgba(238,225,49,1)', // Adding border on top
-                                            }}
-                                            component="img"
-                                            image="https://imagizer.imageshack.com/v2/1024x768q70/923/tfpAjh.jpg"
-                                            alt="Pegasus Seiya [Final Bronze Cloth] ~Golden Limited Edition~"
-                                            title="Pegasus Seiya [Final Bronze Cloth] ~Golden Limited Edition~"
-                                        />
-                                        {/* Logo Overlay */}
-
+                                        {figurine ?
+                                            <CardMedia
+                                                sx={{
+                                                    width: '100%', height: 'auto', objectFit: 'cover',
+                                                    border: '3px solid rgba(238,225,49,1)', // Adding border on top
+                                                }}
+                                                component="img"
+                                                image={figurine.officialImages[0]}
+                                                alt={figurine.baseName}
+                                                title={figurine.displayableName}
+                                            /> : "No Data"}
+                                        {/* Tamashii Nations Logo */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -102,13 +94,10 @@ const FigureView = () => {
                                                 }}
                                                 component="img"
                                                 image="https://imagizer.imageshack.com/img924/7518/J9vnSG.jpg"
-                                                alt="Pegasus Seiya [Final Bronze Cloth] ~Golden Limited Edition~"
-                                                title="Pegasus Seiya [Final Bronze Cloth] ~Golden Limited Edition~"
+                                                alt="Tamashii Nations"
                                             />
-
-
                                         </Box>
-
+                                        {/* Bandai Logo */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -121,7 +110,7 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/2/CXHXAG.png"
-                                                alt="Logo"
+                                                alt="Bandai"
                                                 style={{
                                                     width: '100%',
                                                     height: 'auto',
@@ -129,7 +118,7 @@ const FigureView = () => {
                                                 }}
                                             />
                                         </Box>
-
+                                        {/* Bandai Namco Logo */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -142,7 +131,7 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/4739/icWjzi.png"
-                                                alt="Logo"
+                                                alt="Bandai Namco"
                                                 style={{
                                                     width: '100%',
                                                     height: 'auto',
@@ -150,10 +139,7 @@ const FigureView = () => {
                                                 }}
                                             />
                                         </Box>
-
-
-
-
+                                        {/* Saint Seiya Logo */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -166,7 +152,7 @@ const FigureView = () => {
                                         >
                                             <img
                                                 src="https://imagizer.imageshack.com/img924/2346/9VueKU.png"
-                                                alt="Logo"
+                                                alt="Saint Seiya"
                                                 style={{
                                                     width: '100%',
                                                     height: 'auto',
@@ -174,6 +160,7 @@ const FigureView = () => {
                                                 }}
                                             />
                                         </Box>
+                                        {/* Myth Cloth Logo */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -199,7 +186,7 @@ const FigureView = () => {
                                         padding: 0, background:
                                             'linear-gradient(90deg, rgba(238,225,49,0) 0%, rgba(238,225,49,1) 15%, rgba(238,225,49,1) 75%, rgba(238,225,49,0) 100%)',
                                     }}>
-                                        Cygnus Hyoga [Final Bronze Cloth]
+                                        {figurine ? figurine.displayableName : "No Data"}
                                     </Typography>
                                 </Card>
                             </Grid>
@@ -217,7 +204,7 @@ const FigureView = () => {
                                             {formatAmount("24200.0")} (with tax included)
                                         </Typography>
                                         <br />
-                                        <Divider/>
+                                        <Divider />
                                         <Typography variant="body1" fontWeight="bold">
                                             First Announcement
                                         </Typography>
@@ -251,7 +238,7 @@ const FigureView = () => {
                                             Distribuited by DAM / DTM
                                         </Typography>
                                         <br />
-                                        <Divider/>
+                                        <Divider />
                                         <Typography variant="body1" fontWeight="bold">
                                             Preorder Date
                                         </Typography>
@@ -268,7 +255,7 @@ const FigureView = () => {
                                     </Item>
                                     <Item>
                                         <Typography variant="body1" fontWeight="bold">
-                                            <a href='https://tamashiiweb.com/item/15071' target="_blank">Tamashii URL</a>
+                                            <a href='https://tamashiiweb.com/item/15071' target="_blank" rel="noreferrer">Tamashii URL</a>
                                         </Typography>
                                         <br />
                                         <Typography variant="body1" fontWeight="bold">
@@ -308,7 +295,8 @@ const FigureView = () => {
             </TabContext>
         </Box>
     );
-}
+};
+
 const itemData = [
     {
         img: 'https://imagizer.imageshack.com/img924/2310/lnglLN.jpg',
@@ -350,6 +338,5 @@ const itemData = [
         cols: 2,
     },
 ]
-
 
 export default FigureView;

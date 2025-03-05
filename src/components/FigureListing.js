@@ -1,6 +1,9 @@
-import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Grid2, Paper, Tooltip, Typography } from '@mui/material';
-import axiosInstance from '../FigureForm/axiosValidationInterceptor'
-import { useEffect, useState } from "react";
+import axios from '../utils/axiosValidationInterceptor';
+import { formatAmount, formatDate } from '../utils/formatters';
+
+import { useState, useEffect } from "react";
+import Grid2 from '@mui/material/Grid2';
+import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Paper, Tooltip, Typography } from '@mui/material';
 import FigureDetail from './FigureDetail';
 
 const FigureListing = () => {
@@ -13,7 +16,7 @@ const FigureListing = () => {
 
     // Fetch the data when the component mounts
     useEffect(() => {
-        axiosInstance.get('/figurines')
+        axios.get('/figurines')
             .then(function (response) {
                 setFigurines(response.data); // Assume response.data is an array of objects
             }).catch(function (error) {
@@ -59,11 +62,11 @@ const FigureListing = () => {
                                             </Typography>
                                             <Typography variant="subtitle2" color="text.secondary">
                                                 {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
-                                                    (formatDateWithOrdinal(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
+                                                    (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
                                             </Typography>
                                             <Typography variant="subtitle2" color="text.secondary">
                                                 {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
-                                                    (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDateWithOrdinal(figurine.distributionJPY.firstAnnouncementDate, true))}
+                                                    (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDate(figurine.distributionJPY.firstAnnouncementDate, true))}
                                             </Typography>
                                         </CardContent>
                                     </Tooltip>
@@ -87,47 +90,6 @@ function showDisplayableName(name) {
         return name.substring(0, maxLen - 3) + "...";
     } else {
         return name;
-    }
-}
-function formatAmount(theAmount) {
-    if (theAmount) {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "JPY",
-        }).format(theAmount);
-    } else {
-        return "Not Available";
-    }
-}
-function parseDateWithoutTimezone(dateString) {
-    const [year, month, day] = dateString.split("-").map(Number);
-    return new Date(year, month - 1, day); // Month is 0-based
-}
-function formatDateWithOrdinal(theDate, isConfirmed) {
-    const date = parseDateWithoutTimezone(theDate);
-
-    let options;
-    if (isConfirmed) {
-        options = { month: "long", day: "numeric", year: "numeric" };
-    } else {
-        options = { month: "long", year: "numeric" };
-    }
-    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
-
-    if (isConfirmed) {
-        const day = date.getDate();
-        return formattedDate.replace(/\d+/, `${day}${getOrdinalSuffix(day)}`);
-    } else {
-        return formattedDate;
-    }
-}
-function getOrdinalSuffix(day) {
-    if (day >= 11 && day <= 13) return "th";
-    switch (day % 10) {
-        case 1: return "st";
-        case 2: return "nd";
-        case 3: return "rd";
-        default: return "th";
     }
 }
 

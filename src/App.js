@@ -1,6 +1,6 @@
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import './App.css';
-import FigureManagement from './components/FigureManagement/FigureManagement'
+import FigureManagement from './components/FigureManagement'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 function App() {
