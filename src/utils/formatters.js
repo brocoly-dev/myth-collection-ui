@@ -10,25 +10,28 @@ export const formatAmount = (amount, theCurrency = "JPY") => {
 };
 
 export const formatDate = (dateString, isConfirmed = true) => {
-    const date = parseDateWithoutTimezone(dateString);
+    if (dateString) {
+        const date = parseDateWithoutTimezone(dateString);
+        let options;
+        if (isConfirmed) {
+            options = { month: "long", day: "numeric", year: "numeric" };
+        } else {
+            options = { month: "long", year: "numeric" };
+        }
+        const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
 
-    let options;
-    if (isConfirmed) {
-        options = { month: "long", day: "numeric", year: "numeric" };
+        if (isConfirmed) {
+            const day = date.getDate();
+            return formattedDate.replace(/\d+/, `${day}${getOrdinalSuffix(day)}`);
+        } else {
+            return formattedDate;
+        }
     } else {
-        options = { month: "long", year: "numeric" };
-    }
-    const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
-
-    if (isConfirmed) {
-        const day = date.getDate();
-        return formattedDate.replace(/\d+/, `${day}${getOrdinalSuffix(day)}`);
-    } else {
-        return formattedDate;
+        return "No date available";
     }
 }
 
-function parseDateWithoutTimezone(dateString) {
+export const parseDateWithoutTimezone = (dateString) => {
     const [year, month, day] = dateString.split("-").map(Number);
     return new Date(year, month - 1, day); // Month is 0-based
 }
