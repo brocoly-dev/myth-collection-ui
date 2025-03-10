@@ -2,7 +2,7 @@ import axios from '../utils/axiosValidationInterceptor';
 import { formatAmount, formatDate, parseDateWithoutTimezone } from '../utils/formatters';
 
 import { useState, useEffect } from "react";
-import { Box, Card, CardMedia, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
+import { Box, Card, CardMedia, collapseClasses, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
@@ -58,6 +58,7 @@ const FigureView = ({ id }) => {
                         <Tab label="Personal Gallery" value="3" />
                     </TabList>
                 </Box>
+                {/* The main figurine */}
                 <TabPanel value="1">
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
@@ -329,23 +330,23 @@ const FigureView = ({ id }) => {
                         </Grid>
                     </Box>
                 </TabPanel>
+                {/* Official Gallery */}
                 <TabPanel value="2">
-                    <ImageList
-                        //sx={{ width: 500, height: 450 }}
-                        variant="quilted"
-                        cols={4}
-                    //rowHeight={121}
-                    >
-                        {itemData.map((item) => (
-                            <ImageListItem key={item.img} cols={item.cols || 1} rows={item.rows || 1}>
-                                <img
-                                    {...srcset(item.img, 121, item.rows, item.cols)}
-                                    alt={item.title}
-                                    loading="lazy"
-                                />
-                            </ImageListItem>
-                        ))}
-                    </ImageList>
+                    {figurine &&
+                        <ImageList
+                            variant="masonry"
+                            cols={2} gap={10}
+                        >
+                            {getOfficialImages(figurine).map((item) => (
+                                <ImageListItem key={item.img} cols={item.cols || 1} rows={item.rows || 1}>
+                                    <img
+                                        srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                        src={`${item.img}?w=248&fit=crop&auto=format`}
+                                        loading="lazy"
+                                    />
+                                </ImageListItem>
+                            ))}
+                        </ImageList>}
                 </TabPanel>
                 <TabPanel value="3">Item Three</TabPanel>
             </TabContext>
@@ -353,47 +354,21 @@ const FigureView = ({ id }) => {
     );
 };
 
-const itemData = [
-    {
-        img: 'https://imagizer.imageshack.com/img924/2310/lnglLN.jpg',
-        title: 'Hats',
-        cols: 2,
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img923/8481/tfpAjh.jpg',
-        title: 'Honey',
-        author: '@arwinneil',
-        rows: 2,
-        cols: 2,
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img922/1858/hEwegc.jpg',
-        title: 'Basketball',
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img923/2160/e8ht8W.jpg',
-        title: 'Fern',
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img924/9996/ZtOEBv.jpg',
-        title: 'Mushrooms',
-        rows: 2,
-        cols: 2,
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img923/8605/UFYAIF.jpg',
-        title: 'Tomato basil',
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img922/6605/RZtMYe.jpg',
-        title: 'Sea star',
-    },
-    {
-        img: 'https://imagizer.imageshack.com/img923/4395/jNzBws.jpg',
-        title: 'Bike',
-        cols: 2,
-    },
-]
+function getOfficialImages(figurine) {
+    let images = [];
+
+    figurine.officialImages.forEach(imageUrl => {
+
+        images.push({
+            img: imageUrl,
+            title: 'Title',
+        });
+
+    });
+
+    return images;
+}
+
 function getFigurineRevival(figurine) {
     if (figurine && figurine.revival) {
         return {
