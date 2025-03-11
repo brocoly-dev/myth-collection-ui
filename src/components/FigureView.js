@@ -144,8 +144,8 @@ const FigureView = ({ id }) => {
                                         <Box
                                             sx={{
                                                 position: 'absolute',
-                                                top: '6%',
-                                                left: '13%',
+                                                top: '7%',
+                                                left: '88%',
                                                 transform: 'translate(-50%, -50%)',
                                                 width: '20%', // You can adjust the size
                                                 height: 'auto',
@@ -167,7 +167,7 @@ const FigureView = ({ id }) => {
                                             sx={{
                                                 position: 'absolute',
                                                 top: '7%',
-                                                left: '81%',
+                                                left: '18%',
                                                 transform: 'translate(-50%, -50%)',
                                                 width: '30%', // You can adjust the size
                                                 height: 'auto',
@@ -348,7 +348,7 @@ const FigureView = ({ id }) => {
                             ))}
                         </ImageList>}
                 </TabPanel>
-                <TabPanel value="3">Item Three</TabPanel>
+                <TabPanel value="3">No data to show yet</TabPanel>
             </TabContext>
         </Box>
     );

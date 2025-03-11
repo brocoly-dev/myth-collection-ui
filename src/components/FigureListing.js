@@ -3,10 +3,12 @@ import { formatAmount, formatDate } from '../utils/formatters';
 
 import { useState, useEffect } from "react";
 import Grid2 from '@mui/material/Grid2';
-import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Paper, Tooltip, Typography } from '@mui/material';
+import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Paper, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import FigureDetail from './FigureDetail';
 
 const FigureListing = () => {
+    // State to store the flag to open and hide the dialog
+    const [loading, setLoading] = useState(true);
     // State to store the list of figurines
     const [figurines, setFigurines] = useState([]);
     // State to store the flag to open and hide the dialog
@@ -19,7 +21,9 @@ const FigureListing = () => {
         axios.get('/figurines')
             .then(function (response) {
                 setFigurines(response.data); // Assume response.data is an array of objects
+                setLoading(false);
             }).catch(function (error) {
+                setLoading(true);
                 // If the error is a validation error from backend
                 if (error.response && error.response.data) {
                     // handle error
@@ -41,7 +45,19 @@ const FigureListing = () => {
         setOpen(false);
     };
 
-    return (
+    return loading ? (
+        <Grid2 container spacing={2}>
+            {Array.from({ length: 15 }).map((_, index) => (
+                <Grid2>
+                    <Stack spacing={1}>
+                        <Skeleton variant="rectangular" width={210} height={240} />
+                        <Skeleton variant="text" sx={{ fontSize: '4rem' }} />
+                    </Stack>
+                </Grid2>
+            ))}
+        </Grid2>
+
+    ) : (
         <>
             <Paper sx={{ padding: '16px' }}>
                 <Grid2 container spacing={2}>
@@ -82,6 +98,53 @@ const FigureListing = () => {
             <FigureDetail open={open} onClose={handleClose} figurine={figurineSelected} />
         </>
     );
+
+    /*
+    if (loading) {
+        return <Typography>ddd</Typography>;
+    } else {
+        return
+        <>
+            <Paper sx={{ padding: '16px' }}>
+                <Grid2 container spacing={2}>
+                    {figurines.map((figurine) => (
+                        <Grid2 key={figurine.id}>
+                            <Card sx={{ maxWidth: 210, flexDirection: 'column' }}>
+                                <CardActionArea>
+                                    <Tooltip title={figurine.displayableName} arrow>
+                                        <CardMedia
+                                            component="img"
+                                            image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                            alt={figurine.displayableName}
+                                            title={figurine.displayableName}
+                                        />
+                                        <CardContent sx={{ textAlign: "left" }}>
+                                            <Typography gutterBottom variant="body1" component="div">
+                                                <b>{showDisplayableName(figurine.displayableName)}</b>
+                                            </Typography>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" ? "" :
+                                                    (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))}
+                                            </Typography>
+                                            <Typography variant="subtitle2" color="text.secondary">
+                                                {figurine.status === "RELEASE_TBD" ? "Release Date To be Determined" :
+                                                    (figurine.status === "FUTURE_RELEASE" || figurine.status === "RELEASED") ? "" + (formatAmount(figurine.distributionJPY.finalPrice)) : "First appearance: " + (formatDate(figurine.distributionJPY.firstAnnouncementDate, true))}
+                                            </Typography>
+                                        </CardContent>
+                                    </Tooltip>
+                                </CardActionArea>
+                                <CardActions disableSpacing>
+                                    <Button onClick={() => handleClickOpen(figurine)} size="small" disabled={figurine.status === "RELEASE_TBD"}>View More</Button>
+                                </CardActions>
+                            </Card>
+                        </Grid2>
+                    ))}
+                </Grid2>
+            </Paper>
+            <FigureDetail open={open} onClose={handleClose} figurine={figurineSelected} />
+        </>
+    }
+        */
 };
 
 function showDisplayableName(name) {

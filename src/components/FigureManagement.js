@@ -1,3 +1,4 @@
+import { formatDate } from '../utils/formatters';
 import { Box, extendTheme, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { AppProvider, DashboardLayout, PageContainer, ThemeSwitcher } from '@toolpad/core';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,7 +8,10 @@ import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import BoyIcon from '@mui/icons-material/Boy';
+import Person4RoundedIcon from '@mui/icons-material/Person4Rounded';
+import PeopleAltRoundedIcon from '@mui/icons-material/PeopleAltRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
+import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 
 import { useEffect, useState, useMemo } from "react";
 
@@ -93,8 +97,8 @@ function createChildren(basicFigurines, lineup) {
         .forEach((figurine) => {
             children.push({
                 segment: 'figurine-' + figurine.id,
+                icon: <Tooltip title={formatDate(figurine.releaseDate, figurine.releaseDateConfirmed)}>{figurine.status === 'RELEASED' ? figurine.revival ? <Person4RoundedIcon /> : figurine.set ? <PeopleAltRoundedIcon /> : <PersonRoundedIcon /> : <PersonOutlineRoundedIcon />}</Tooltip>,
                 title: figurine.displayableName,
-                icon: <BoyIcon />
             });
         });
 
