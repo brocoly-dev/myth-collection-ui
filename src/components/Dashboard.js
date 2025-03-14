@@ -63,6 +63,8 @@ const Dashboard = () => {
                     outerRadius: 140,
                     data,
                     arcLabel: getArcLabel,
+                    arcLabelMinAngle: 10,
+                    arcLabelRadius: '65%'
                 }]}
                     sx={{
                         [`& .${pieArcLabelClasses.root}`]: {
