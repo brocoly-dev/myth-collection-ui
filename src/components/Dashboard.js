@@ -1,12 +1,13 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, CircularProgress, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import axios from '../utils/axiosValidationInterceptor';
 import { useState, useEffect } from "react";
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts';
 
 
 const sizing = {
-    margin: { right: 5 },
-    width: 900,
+    //margin: { right: 5 },
+    width: 800,
     height: 300,
     legend: { hidden: false },
 };
@@ -51,30 +52,186 @@ const Dashboard = () => {
         fetchData();
     }, []);
 
-    return (
-        <Box display="flex" flexDirection="column" alignItems="center">
-            <Typography variant="h5" gutterBottom>
-                Figurine Lineup Distribution
-            </Typography>
-            {loading ? (
+    return loading ? (
+        <Grid container spacing={2}>
+            <Grid size={4}>
                 <CircularProgress />
-            ) : (
-                <PieChart series={[{
-                    outerRadius: 140,
-                    data,
-                    arcLabel: getArcLabel,
-                    arcLabelMinAngle: 10,
-                    arcLabelRadius: '65%'
-                }]}
-                    sx={{
-                        [`& .${pieArcLabelClasses.root}`]: {
-                            fill: 'white',
-                            fontSize: 15,
-                        },
-                    }}
-                    {...sizing} />
-            )}
-        </Box>
+            </Grid>
+        </Grid>
+    ) : (
+        <Grid container spacing={2}>
+            <Grid>
+                <Card>
+                    <CardHeader title="Figurines by lineup" />
+                    <CardContent>
+                        <PieChart series={[{
+                            outerRadius: 140,
+                            data,
+                            arcLabel: getArcLabel,
+                            arcLabelMinAngle: 10,
+                            arcLabelRadius: '65%'
+                        }]}
+                            sx={{
+                                [`& .${pieArcLabelClasses.root}`]: {
+                                    fill: 'white',
+                                    fontSize: 15,
+                                },
+                            }}
+                            {...sizing} />
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid size={4}>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds</Typography>
+            </Grid>
+            <Grid>
+                <Typography>ds1</Typography>
+            </Grid>
+        </Grid>
     );
 };
 
