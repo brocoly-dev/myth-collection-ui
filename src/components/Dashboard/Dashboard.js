@@ -14,21 +14,8 @@ const Dashboard = () => {
                 const lineupsResponse = await axios.get('/lineups');
                 const basicFigurinesResponse = await axios.get('/figurines/basics');
 
-                let figurinesByLineup = [];
-
-                lineupsResponse.data.forEach((lineup) => {
-                    let total = basicFigurinesResponse.data
-                        .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
-                        .filter(f => f.lineUp === lineup.key)
-                        .length;
-
-                    figurinesByLineup.push({
-                        label: lineup.description,
-                        value: total,
-                        color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase()}`
-                    });
-                    setData(figurinesByLineup);
-                });
+                setData(extractFigurinesByLineup(lineupsResponse.data, basicFigurinesResponse.data));
+                
             } catch (err) {
                 console.error('Error creating the dashboard', err);
             } finally {
@@ -37,6 +24,24 @@ const Dashboard = () => {
         };
         fetchData();
     }, []);
+
+    function extractFigurinesByLineup(lineups, basicFigurines) {
+        let figurinesByLineup = [];
+
+        lineups.forEach((lineup) => {
+            let total = basicFigurines
+                .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
+                .filter(f => f.lineUp === lineup.key)
+                .length;
+
+            figurinesByLineup.push({
+                label: lineup.description,
+                value: total,
+                color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase()}`
+            });
+        });
+        return figurinesByLineup;
+    }
 
     return loading ? (
         <Grid container spacing={2}>
