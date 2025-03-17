@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '@mui/material';
 export default function PieChartInfo({ title, data }) {
 
     const sizing = {
-        //margin: { right: 5 },
+        margin: { right: 200 },
         width: 800,
         height: 300,
         legend: { hidden: false },
