@@ -21,6 +21,8 @@ const Dashboard = () => {
     const [dataBySeries, setDataBySeries] = useState([]);
     const [dataByAnniversaries, setDataByAnniversaries] = useState([]);
 
+    const [datasetByYear, setDatasetByYear] = useState([]);
+
     const [loading, setLoading] = useState(true);
 
     const handleChange = (event, newValue) => {
@@ -170,7 +172,7 @@ const Dashboard = () => {
                             :
                             <Grid container spacing={2}>
                                 <Grid width="100%">
-                                    <BarChartInfo title='Total figurines by lineup' />
+                                    <BarChartInfo title='Number of releases by year' dataset={datasetByYear} />
                                 </Grid>
                             </Grid>
                     }
