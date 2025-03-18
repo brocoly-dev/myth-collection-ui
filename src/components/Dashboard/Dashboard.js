@@ -9,6 +9,8 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import { BarChart } from '@mui/x-charts';
+import BarChartInfo from './BarChartInfo';
 
 
 const Dashboard = () => {
@@ -158,7 +160,20 @@ const Dashboard = () => {
                     }
                 </TabPanel>
                 <TabPanel value="2">
-                    2
+                    {
+                        loading ?
+                            <Grid container spacing={2}>
+                                <Grid size={4}>
+                                    <CircularProgress />
+                                </Grid>
+                            </Grid>
+                            :
+                            <Grid container spacing={2}>
+                                <Grid width="100%">
+                                    <BarChartInfo title='Total figurines by lineup' />
+                                </Grid>
+                            </Grid>
+                    }
                 </TabPanel>
                 <TabPanel value="3">
                     3
