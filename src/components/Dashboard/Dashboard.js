@@ -1,16 +1,29 @@
-import { CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Tab } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import axios from '../../utils/axiosValidationInterceptor';
 import PieChartInfo from './PieChartInfo';
 import { useState, useEffect } from "react";
 
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+
+import PieChartIcon from '@mui/icons-material/PieChart';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import TimelineIcon from '@mui/icons-material/Timeline';
+
+
 const Dashboard = () => {
+    const [value, setValue] = useState('1');
+
     const [dataByLineups, setDataByLineups] = useState([]);
     const [dataByCategories, setDataByCategories] = useState([]);
     const [dataBySeries, setDataBySeries] = useState([]);
     const [dataByAnniversaries, setDataByAnniversaries] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,7 +33,6 @@ const Dashboard = () => {
                 const seriesResponse = await axios.get('/series');
                 const anniversariesResponse = await axios.get('/anniversaries');
                 const basicFigurinesResponse = await axios.get('/figurines/basics');
-                
 
                 setDataByLineups(extractFigurinesByLineup(lineupsResponse.data, basicFigurinesResponse.data));
                 setDataByCategories(extractFigurinesByCategory(categoriesResponse.data, basicFigurinesResponse.data));
@@ -109,27 +121,50 @@ const Dashboard = () => {
         return data;
     }
 
-    return loading ? (
-        <Grid container spacing={2}>
-            <Grid size={4}>
-                <CircularProgress />
-            </Grid>
-        </Grid>
-    ) : (
-        <Grid container spacing={2}>
-            <Grid>
-                <PieChartInfo title='Total figurines by lineup' data={dataByLineups} />
-            </Grid>
-            <Grid>
-                <PieChartInfo title='Total figurines by category' data={dataByCategories} />
-            </Grid>
-            <Grid>
-                <PieChartInfo title='Total figurines by series' data={dataBySeries} />
-            </Grid>
-            <Grid>
-                <PieChartInfo title='Total figurines by anniversary' data={dataByAnniversaries} />
-            </Grid>
-        </Grid>
+    return (
+        <Box sx={{ width: '100%', typography: 'body1' }}>
+            <TabContext value={value}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <TabList onChange={handleChange} aria-label="lab API tabs example">
+                        <Tab icon={<PieChartIcon />} value="1" />
+                        <Tab icon={<BarChartIcon />} value="2" />
+                        <Tab icon={<TimelineIcon />} value="3" />
+                    </TabList>
+                </Box>
+                {/* Pie Charts */}
+                <TabPanel value="1">
+                    {
+                        loading ?
+                            <Grid container spacing={2}>
+                                <Grid size={4}>
+                                    <CircularProgress />
+                                </Grid>
+                            </Grid>
+                            :
+                            <Grid container spacing={2}>
+                                <Grid>
+                                    <PieChartInfo title='Total figurines by lineup' data={dataByLineups} />
+                                </Grid>
+                                <Grid>
+                                    <PieChartInfo title='Total figurines by category' data={dataByCategories} />
+                                </Grid>
+                                <Grid>
+                                    <PieChartInfo title='Total figurines by series' data={dataBySeries} />
+                                </Grid>
+                                <Grid>
+                                    <PieChartInfo title='Total figurines by anniversary' data={dataByAnniversaries} />
+                                </Grid>
+                            </Grid>
+                    }
+                </TabPanel>
+                <TabPanel value="2">
+                    2
+                </TabPanel>
+                <TabPanel value="3">
+                    3
+                </TabPanel>
+            </TabContext>
+        </Box>
     );
 };
 

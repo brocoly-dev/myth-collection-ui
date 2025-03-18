@@ -2,7 +2,7 @@ import axios from '../utils/axiosValidationInterceptor';
 import { formatAmount, formatDate, parseDateWithoutTimezone } from '../utils/formatters';
 
 import { useState, useEffect } from "react";
-import { Box, Card, CardMedia, collapseClasses, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
+import { Box, Card, CardMedia, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
@@ -28,14 +28,6 @@ const FigureView = ({ id }) => {
 
         fetchData();
     }, [id]); // Runs only when 'id' changes.
-
-    function srcset(image, size, rows = 1, cols = 1) {
-        return {
-            src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-            srcSet: `${image}?w=${size * cols}&h=${size * rows
-                }&fit=crop&auto=format&dpr=2 2x`,
-        };
-    }
 
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: '#fff',
