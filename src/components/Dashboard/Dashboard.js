@@ -9,7 +9,6 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import { BarChart } from '@mui/x-charts';
 import BarChartInfo from './BarChartInfo';
 
 
@@ -23,6 +22,8 @@ const Dashboard = () => {
     const [dataBySeries, setDataBySeries] = useState([]);
     const [dataByAnniversaries, setDataByAnniversaries] = useState([]);
 
+    const [lineupsResponseData, setLineupsResponseData] = useState([]);
+    const [basicFigurinesResponseData, setBasicFigurinesResponseData] = useState([]);
     const [datasetByYear, setDatasetByYear] = useState([]);
     const [seriesByYear, setSeriesByYear] = useState([]);
 
@@ -32,10 +33,20 @@ const Dashboard = () => {
         setValue(newValue);
     };
 
+    const handleYearChange = (event) => {
+        const yearSelected = event.target.value;
+
+        const lineUpSeries = extractSeriesByYear(lineupsResponseData, basicFigurinesResponseData, yearSelected);
+        const figurinesDataSet = extractDatasetByYear(lineUpSeries, basicFigurinesResponseData, yearSelected);
+
+        setSelectedYear(yearSelected);
+        setSeriesByYear(lineUpSeries);
+        setDatasetByYear(figurinesDataSet);
+    }
+
     const startYear = 2003;
     const currentYear = new Date().getFullYear();
     const allYears = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i).reverse();
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,8 +62,13 @@ const Dashboard = () => {
                 setDataBySeries(extractFigurinesBySeries(seriesResponse.data, basicFigurinesResponse.data));
                 setDataByAnniversaries(extractFigurinesByAnniversaries(anniversariesResponse.data, basicFigurinesResponse.data));
 
-                setDatasetByYear(extractDatasetByYear(lineupsResponse.data, basicFigurinesResponse.data));
+                const lineUpSeries = extractSeriesByYear(lineupsResponse.data, basicFigurinesResponse.data, currentYear);
+                const figurinesDataSet = extractDatasetByYear(lineUpSeries, basicFigurinesResponse.data, currentYear);
 
+                setLineupsResponseData(lineupsResponse.data);
+                setBasicFigurinesResponseData(basicFigurinesResponse.data);
+                setSeriesByYear(lineUpSeries);
+                setDatasetByYear(figurinesDataSet);
             } catch (err) {
                 console.error('Error creating the dashboard', err);
             } finally {
@@ -60,7 +76,7 @@ const Dashboard = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [currentYear]);
 
     function extractFigurinesByLineup(lineups, basicFigurines) {
         let data = [];
@@ -135,11 +151,11 @@ const Dashboard = () => {
         return data;
     }
 
-    function extractDatasetByYear(lineups, basicFigurines) {
+    function extractSeriesByYear(lineups, basicFigurines, year) {
         // gets the data in a specific year
         const figurinesByYear = basicFigurines
             .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
-            .filter(f => new Date(f.releaseDate).getFullYear() === selectedYear);
+            .filter(f => new Date(f.releaseDate).getFullYear() === year);
 
         const lineUpSeries = [];
         lineups.forEach((lineup) => {
@@ -152,7 +168,14 @@ const Dashboard = () => {
             }
         });
 
-        setSeriesByYear(lineUpSeries);
+        return lineUpSeries;
+    }
+
+    function extractDatasetByYear(lineUpSeries, basicFigurines, year) {
+        // gets the data in a specific year
+        const figurinesByYear = basicFigurines
+            .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
+            .filter(f => new Date(f.releaseDate).getFullYear() === year);
 
         const months = [
             { id: 0, value: 'Jan' }, { id: 1, value: 'Feb' }, { id: 2, value: 'Mar' }, { id: 3, value: 'Apr' }, { id: 4, value: 'May' }, { id: 5, value: 'June' },
@@ -233,7 +256,7 @@ const Dashboard = () => {
                                         sx={{ minWidth: 150 }}
                                         label="Select a year"
                                         value={selectedYear}
-                                        onChange={(event) => setSelectedYear(event.target.value)}>
+                                        onChange={handleYearChange}>
 
                                         {allYears.map((year) => (
                                             <MenuItem value={year}>{year}</MenuItem>
