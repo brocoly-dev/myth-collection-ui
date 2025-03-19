@@ -4,7 +4,10 @@ import { axisClasses } from '@mui/x-charts/ChartsAxis';
 import { dataset2, valueFormatter } from './weather';
 import { Card, CardContent, CardHeader } from '@mui/material';
 
-export default function BarChartInfo({ title, dataset }) {
+export default function BarChartInfo({ title, dataset, series }) {
+
+    //console.log('Series ....');
+    //console.log(series);
 
     const chartSetting = {
         yAxis: [
@@ -22,12 +25,7 @@ export default function BarChartInfo({ title, dataset }) {
                 <BarChart
                     dataset={dataset}
                     xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-                    series={[
-                        { dataKey: 'london', label: 'London', valueFormatter },
-                        { dataKey: 'paris', label: 'Paris', valueFormatter },
-                        { dataKey: 'newYork', label: 'New York', valueFormatter },
-                        { dataKey: 'seoul', label: 'Seoul', valueFormatter },
-                    ]}
+                    series={series}
                     {...chartSetting}
                 />
             </CardContent>

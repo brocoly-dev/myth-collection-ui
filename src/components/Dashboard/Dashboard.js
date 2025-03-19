@@ -22,6 +22,7 @@ const Dashboard = () => {
     const [dataByAnniversaries, setDataByAnniversaries] = useState([]);
 
     const [datasetByYear, setDatasetByYear] = useState([]);
+    const [seriesByYear, setSeriesByYear] = useState([]);
 
     const [loading, setLoading] = useState(true);
 
@@ -42,6 +43,8 @@ const Dashboard = () => {
                 setDataByCategories(extractFigurinesByCategory(categoriesResponse.data, basicFigurinesResponse.data));
                 setDataBySeries(extractFigurinesBySeries(seriesResponse.data, basicFigurinesResponse.data));
                 setDataByAnniversaries(extractFigurinesByAnniversaries(anniversariesResponse.data, basicFigurinesResponse.data));
+
+                setDatasetByYear(extractDatasetByYear(lineupsResponse.data, basicFigurinesResponse.data));
 
             } catch (err) {
                 console.error('Error creating the dashboard', err);
@@ -125,6 +128,61 @@ const Dashboard = () => {
         return data;
     }
 
+    function extractDatasetByYear(lineups, basicFigurines) {
+        const years = basicFigurines
+            .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
+            .map(f => new Date(f.releaseDate))
+            .map(f => f.getFullYear())
+            .filter((year, index, self) => self.indexOf(year) === index);
+
+        const currYear = years[20];
+        
+
+        // gets the data in a specific year
+        const figurinesByYear = basicFigurines
+            .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
+            .filter(f => new Date(f.releaseDate).getFullYear() === currYear);
+
+        const lineUpSeries = [];
+        lineups.forEach((lineup) => {
+            let total = figurinesByYear
+                .filter(f => f.lineUp === lineup.key)
+                .length;
+
+            if (total !== 0) {
+                lineUpSeries.push({ dataKey: lineup.key, label: lineup.description, value: total + " releases" });
+            }
+        });
+
+        setSeriesByYear(lineUpSeries);
+
+        const months = [
+            { id: 0, value: 'Jan' }, { id: 1, value: 'Feb' }, { id: 2, value: 'Mar' }, { id: 3, value: 'Apr' }, { id: 4, value: 'May' }, { id: 5, value: 'June' },
+            { id: 6, value: 'July' }, { id: 7, value: 'Aug' }, { id: 8, value: 'Sept' }, { id: 9, value: 'Oct' }, { id: 10, value: 'Nov' }, { id: 11, value: 'Dec' }
+        ];
+
+        let data = [];
+
+        const monthProp = 'month';
+        months.forEach((month) => {
+            let obj = {};
+            lineUpSeries.forEach((lseries) => {
+
+                const total = figurinesByYear
+                    .filter(f => new Date(f.releaseDate).getMonth() === month.id)
+                    .filter(f => f.lineUp === lseries.dataKey)
+                    .length;
+
+                obj[lseries.dataKey] = total;
+            });
+
+            obj[monthProp] = month.value;
+            data.push(obj);
+        });
+
+        return data;
+    }
+
     return (
         <Box sx={{ width: '100%', typography: 'body1' }}>
             <TabContext value={value}>
@@ -172,7 +230,7 @@ const Dashboard = () => {
                             :
                             <Grid container spacing={2}>
                                 <Grid width="100%">
-                                    <BarChartInfo title='Number of releases by year' dataset={datasetByYear} />
+                                    <BarChartInfo title='Number of releases by year' dataset={datasetByYear} series={seriesByYear} />
                                 </Grid>
                             </Grid>
                     }
