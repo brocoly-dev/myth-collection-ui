@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Tab } from '@mui/material';
+import { Box, CircularProgress, MenuItem, Tab, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import axios from '../../utils/axiosValidationInterceptor';
 import PieChartInfo from './PieChartInfo';
@@ -16,6 +16,8 @@ import BarChartInfo from './BarChartInfo';
 const Dashboard = () => {
     const [value, setValue] = useState('1');
 
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
     const [dataByLineups, setDataByLineups] = useState([]);
     const [dataByCategories, setDataByCategories] = useState([]);
     const [dataBySeries, setDataBySeries] = useState([]);
@@ -29,6 +31,11 @@ const Dashboard = () => {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const startYear = 2003;
+    const currentYear = new Date().getFullYear();
+    const allYears = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i).reverse();
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -129,19 +136,10 @@ const Dashboard = () => {
     }
 
     function extractDatasetByYear(lineups, basicFigurines) {
-        const years = basicFigurines
-            .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
-            .map(f => new Date(f.releaseDate))
-            .map(f => f.getFullYear())
-            .filter((year, index, self) => self.indexOf(year) === index);
-
-        const currYear = years[20];
-        
-
         // gets the data in a specific year
         const figurinesByYear = basicFigurines
             .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
-            .filter(f => new Date(f.releaseDate).getFullYear() === currYear);
+            .filter(f => new Date(f.releaseDate).getFullYear() === selectedYear);
 
         const lineUpSeries = [];
         lineups.forEach((lineup) => {
@@ -230,6 +228,17 @@ const Dashboard = () => {
                             :
                             <Grid container spacing={2}>
                                 <Grid width="100%">
+                                    <TextField
+                                        select
+                                        sx={{ minWidth: 150 }}
+                                        label="Select a year"
+                                        value={selectedYear}
+                                        onChange={(event) => setSelectedYear(event.target.value)}>
+
+                                        {allYears.map((year) => (
+                                            <MenuItem value={year}>{year}</MenuItem>
+                                        ))}
+                                    </TextField>
                                     <BarChartInfo title='Number of releases by year' dataset={datasetByYear} series={seriesByYear} />
                                 </Grid>
                             </Grid>
