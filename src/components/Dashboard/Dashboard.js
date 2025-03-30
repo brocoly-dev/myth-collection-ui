@@ -10,6 +10,7 @@ import PieChartIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import BarChartInfo from './BarChartInfo';
+import LineChartInfo from './LineChartInfo';
 
 
 const Dashboard = () => {
@@ -26,6 +27,8 @@ const Dashboard = () => {
     const [basicFigurinesResponseData, setBasicFigurinesResponseData] = useState([]);
     const [datasetByYear, setDatasetByYear] = useState([]);
     const [seriesByYear, setSeriesByYear] = useState([]);
+
+    const [datasetByLineups, setDatasetByLineups] = useState(new Map([]));
 
     const [loading, setLoading] = useState(true);
 
@@ -69,6 +72,9 @@ const Dashboard = () => {
                 setBasicFigurinesResponseData(basicFigurinesResponse.data);
                 setSeriesByYear(lineUpSeries);
                 setDatasetByYear(figurinesDataSet);
+
+                const priceFigurinesDataSet = extractDatasetByLineup(lineupsResponse.data, basicFigurinesResponse.data);
+                setDatasetByLineups(priceFigurinesDataSet);
             } catch (err) {
                 console.error('Error creating the dashboard', err);
             } finally {
@@ -204,6 +210,27 @@ const Dashboard = () => {
         return data;
     }
 
+    function extractDatasetByLineup(lineups, basicFigurines) {
+        const myMap = new Map();
+        const reverseBasicFigurines = basicFigurines.reverse();
+
+        lineups.forEach((lineup) => {
+
+            let basicFigurinesBylineup = reverseBasicFigurines
+                .filter(f => f.status === 'RELEASED' || f.status === 'FUTURE_RELEASE')
+                .filter(f => !f.hk)
+                .filter(f => f.lineUp === lineup.key)
+                .map(f => ({
+                    releaseDate: new Date(f.releaseDate),  // Change 'releaseDate' to 'releaseDate'
+                    name: f.displayableName,   // Change 'displayableName' to 'name'
+                    price: f.finalPrice      // Change 'finalPrice' to 'price'
+                }));
+
+            myMap.set(lineup.description, basicFigurinesBylineup);
+        });
+        return myMap;
+    }
+
     return (
         <Box sx={{ width: '100%', typography: 'body1' }}>
             <TabContext value={value}>
@@ -268,7 +295,23 @@ const Dashboard = () => {
                     }
                 </TabPanel>
                 <TabPanel value="3">
-                    3
+                    {
+                        loading ?
+                            <Grid container spacing={2}>
+                                <Grid size={4}>
+                                    <CircularProgress />
+                                </Grid>
+                            </Grid>
+                            :
+                            <Grid container spacing={2}>
+                                {/* Convert Map to Array and iterate */}
+                                {[...datasetByLineups.entries()].map(([lineup, data]) => (
+                                    <Grid width="100%">
+                                        <LineChartInfo title={lineup} dataset={data} />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                    }
                 </TabPanel>
             </TabContext>
         </Box>
