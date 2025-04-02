@@ -4,17 +4,12 @@ import { formatAmount, formatDate } from '../utils/formatters';
 import { useState, useEffect } from "react";
 import Grid from '@mui/material/Grid2';
 import { Button, Card, CardActionArea, CardActions, CardContent, CardMedia, Paper, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
-import FigureDetail from './FigureDetail';
 
-const FigureListing = () => {
+const FigureListing = ({ navigate }) => {
     // State to store the flag to open and hide the dialog
     const [loading, setLoading] = useState(true);
     // State to store the list of figurines
     const [figurines, setFigurines] = useState([]);
-    // State to store the flag to open and hide the dialog
-    const [open, setOpen] = useState(false);
-    // State to store the slected figurine
-    const [figurineSelected, setFigurineSelected] = useState();
 
     // Fetch the data when the component mounts
     useEffect(() => {
@@ -37,12 +32,7 @@ const FigureListing = () => {
     }, []); // Empty dependency array means this runs once when the component mounts
 
     const handleClickOpen = (figurine) => {
-        setOpen(true);
-        setFigurineSelected(figurine);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
+        navigate('/mythcloth/figurine-' + figurine.id);
     };
 
     return loading ? (
@@ -95,7 +85,6 @@ const FigureListing = () => {
                     ))}
                 </Grid>
             </Paper>
-            <FigureDetail open={open} onClose={handleClose} figurine={figurineSelected} />
         </>
     );
 };

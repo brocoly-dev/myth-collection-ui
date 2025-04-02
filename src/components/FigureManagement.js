@@ -1,5 +1,5 @@
 import { formatDate } from '../utils/formatters';
-import { Box, extendTheme, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Button, extendTheme, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { AppProvider, DashboardLayout, PageContainer, ThemeSwitcher } from '@toolpad/core';
 import SearchIcon from '@mui/icons-material/Search';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -182,16 +182,16 @@ function useDemoRouter(initialPath) {
 }
 
 const Reports = () => <h1>Reports</h1>;
-const Default = () => <h1>Default Page</h1>;
+const Default = ({navigate}) => <><Button onClick={() => { navigate('/mythcloth/figurine-67d6c51a22ee2969c81bd435'); }}>Test</Button></>;
 
-function PageContent({ pathname }) {
+function PageContent({ pathname, navigate }) {
     let currentPage;
     const FIGURINE_PREFIX = "figurine-";
 
     if (pathname === "/dashboard") {
         currentPage = <Dashboard />
     } else if (pathname === "/figurines") {
-        currentPage = <FigureListing />;
+        currentPage = <FigureListing navigate={navigate} />;
     } else if (pathname.includes(FIGURINE_PREFIX)) {
         let index = pathname.indexOf(FIGURINE_PREFIX);
         const figurineId = pathname.substring(index + FIGURINE_PREFIX.length);
@@ -199,7 +199,7 @@ function PageContent({ pathname }) {
     } else if (pathname === "/reports/sales") {
         currentPage = <Reports />;
     } else {
-        currentPage = <Default />
+        currentPage = <Default navigate={navigate}/>
     }
 
     return (
@@ -256,7 +256,7 @@ const FigureManagement = (props) => {
                 sidebarFooter: SidebarFooter,
             }}>
                 <PageContainer>
-                    <PageContent pathname={router.pathname} />
+                    <PageContent pathname={router.pathname} navigate={router.navigate} />
                 </PageContainer>
             </DashboardLayout>
         </AppProvider>
