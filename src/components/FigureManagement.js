@@ -1,7 +1,6 @@
 import { formatDate } from '../utils/formatters';
-import { Box, Button, extendTheme, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Button, extendTheme, Stack, Tooltip, Typography } from '@mui/material';
 import { AppProvider, DashboardLayout, PageContainer, ThemeSwitcher } from '@toolpad/core';
-import SearchIcon from '@mui/icons-material/Search';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
@@ -117,37 +116,9 @@ function SidebarFooter({ mini }) {
 }
 
 function ToolbarActionsSearch() {
+
     return (
-        <Stack direction="row">
-            <Tooltip title="Search" enterDelay={1000}>
-                <div>
-                    <IconButton
-                        type="button"
-                        aria-label="search"
-                        sx={{
-                            display: { xs: 'inline', md: 'none' },
-                        }}
-                    >
-                        <SearchIcon />
-                    </IconButton>
-                </div>
-            </Tooltip>
-            <TextField
-                label="Search"
-                variant="outlined"
-                size="small"
-                slotProps={{
-                    input: {
-                        endAdornment: (
-                            <IconButton type="button" aria-label="search" size="small">
-                                <SearchIcon />
-                            </IconButton>
-                        ),
-                        sx: { pr: 0.5 },
-                    },
-                }}
-                sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
-            />
+        <Stack direction="row" spacing={2}>
             <ThemeSwitcher />
         </Stack>
     );
@@ -182,7 +153,7 @@ function useDemoRouter(initialPath) {
 }
 
 const Reports = () => <h1>Reports</h1>;
-const Default = ({navigate}) => <><Button onClick={() => { navigate('/mythcloth/figurine-67d6c51a22ee2969c81bd435'); }}>Test</Button></>;
+const Default = ({ navigate }) => <><Button onClick={() => { navigate('/mythcloth/figurine-67d6c51a22ee2969c81bd435'); }}>Test</Button></>;
 
 function PageContent({ pathname, navigate }) {
     let currentPage;
@@ -199,7 +170,7 @@ function PageContent({ pathname, navigate }) {
     } else if (pathname === "/reports/sales") {
         currentPage = <Reports />;
     } else {
-        currentPage = <Default navigate={navigate}/>
+        currentPage = <Default navigate={navigate} />
     }
 
     return (
@@ -254,9 +225,16 @@ const FigureManagement = (props) => {
             <DashboardLayout slots={{
                 toolbarActions: ToolbarActionsSearch,
                 sidebarFooter: SidebarFooter,
+            }} slotProps={{
+                toolbarActions: {
+
+                }
             }}>
                 <PageContainer>
-                    <PageContent pathname={router.pathname} navigate={router.navigate} />
+                    <PageContent
+                        pathname={router.pathname}
+                        navigate={router.navigate}
+                    />
                 </PageContainer>
             </DashboardLayout>
         </AppProvider>
