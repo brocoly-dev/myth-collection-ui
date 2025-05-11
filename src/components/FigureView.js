@@ -1,5 +1,6 @@
 import axios from '../utils/axiosValidationInterceptor';
 import { formatAmount, formatDate, parseDateWithoutTimezone } from '../utils/formatters';
+import { findColorByCategory, findMythClothLogoByLineUp } from '../utils/commons';
 
 import { useState, useEffect } from "react";
 import { Box, Card, CardMedia, Divider, ImageList, ImageListItem, Paper, Stack, styled, Tab, Typography } from "@mui/material";
@@ -55,7 +56,9 @@ const FigureView = ({ id }) => {
                     <Box sx={{ flexGrow: 1 }}>
                         <Grid container spacing={2}>
                             <Grid size={8}>
-                                <Card>
+                                <Card sx={{
+                                    boxShadow: 'none', // remove default shadow if desired
+                                }} >
                                     <Box sx={{ position: 'relative' }}>
                                         {figurine ?
                                             <CardMedia
@@ -167,7 +170,7 @@ const FigureView = ({ id }) => {
                                         >
                                             {figurine && showLogo(figurine) &&
                                                 <img
-                                                    src={getMythClothLogoUrl(figurine)}
+                                                    src={findMythClothLogoByLineUp(figurine.lineUp)}
                                                     alt="Myth Cloth"
                                                     style={{
                                                         width: '100%',
@@ -335,6 +338,7 @@ const FigureView = ({ id }) => {
                                         srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
                                         src={`${item.img}?w=248&fit=crop&auto=format`}
                                         loading="lazy"
+                                        alt=''
                                     />
                                 </ImageListItem>
                             ))}
@@ -364,7 +368,7 @@ function getOfficialImages(figurine) {
 function getFigurineRevival(figurine) {
     if (figurine && figurine.revival) {
         return {
-            padding: 0, background: 'linear-gradient(90deg, rgba(238,225,49,0) 0%, ' + determineColorFigurine(figurine) + ' 15%, ' + determineColorFigurine(figurine) + ' 75%, rgba(238,225,49,0) 100%)'
+            padding: 0, background: 'linear-gradient(90deg, rgba(238,225,49,0) 0%, ' + findColorByCategory(figurine.category) + ' 15%, ' + findColorByCategory(figurine.category) + ' 75%, rgba(238,225,49,0) 100%)'
         };
     } else {
         return {};
@@ -373,61 +377,7 @@ function getFigurineRevival(figurine) {
 function getFigurineBorder(figurine) {
     return {
         width: '100%', height: 'auto', objectFit: 'cover',
-        border: '4px solid ' + determineColorFigurine(figurine), // Adding border on top
-    }
-}
-
-function determineColorFigurine(figurine) {
-    if (figurine.category === "V1") {
-        return "#f2f2f2";
-    }
-    if (figurine.category === "V2") {
-        return "#4f5061";
-    }
-    if (figurine.category === "V3") {
-        return "#3b5c77";
-    }
-    if (figurine.category === "V4") {
-        return "#00d3ff";
-    }
-    if (figurine.category === "V5") {
-        return "#008eff";
-    }
-    if (figurine.category === "SECONDARY") {
-        return "#71a3c1";
-    }
-    if (figurine.category === "BLACK") {
-        return "#222222";
-    }
-    if (figurine.category === "STEEL") {
-        return "#6a6a6a";
-    }
-    if (figurine.category === "SILVER") {
-        return "#9e9e9e";
-    }
-    if (figurine.category === "GOLD") {
-        return "#efe031";
-    }
-    if (figurine.category === "ROBE") {
-        return "#0967c3";
-    }
-    if (figurine.category === "SCALE") {
-        return "#269fe0";
-    }
-    if (figurine.category === "SURPLICE") {
-        return "#4d1c8d";
-    }
-    if (figurine.category === "SPECTER") {
-        return "#332584";
-    }
-    if (figurine.category === "JUDGE") {
-        return "#3f6178";
-    }
-    if (figurine.category === "GOD") {
-        return "#b6b6b6";
-    }
-    if (figurine.category === "INHERITOR") {
-        return "#ffe066";
+        border: '4px solid ' + findColorByCategory(figurine.category), // Adding border on top
     }
 }
 
@@ -468,28 +418,5 @@ function getSaintSeiyaLogoUrl(figurine) {
         return "";
     }
 }
-
-function getMythClothLogoUrl(figurine) {
-    if (figurine.lineUp === "MYTH_CLOTH_EX") {
-        return "https://imagizer.imageshack.com/img922/1037/VGb1UY.png";
-    } else if (figurine.lineUp === "MYTH_CLOTH") {
-        return "https://imagizer.imageshack.com/img924/6752/iUnW9X.png";
-    } else if (figurine.lineUp === "APPENDIX") {
-        return "https://imagizer.imageshack.com/img924/4460/ie9qrP.png";
-    } else if (figurine.lineUp === "SC_LEGEND") {
-        return "https://imagizer.imageshack.com/img923/1657/Q5BSqo.png";
-    } else if (figurine.lineUp === "FIGUARTS") {
-        return "https://imagizer.imageshack.com/img924/8374/u8fqwi.png";
-    } else if (figurine.lineUp === "FIGUARTS_ZERO") {
-        return "https://imagizer.imageshack.com/img924/3571/4Lb8pL.png";
-    } else if (figurine.lineUp === "SC_CROWN") {
-        return "https://imagizer.imageshack.com/img922/4038/bdn9mi.png";
-    } else if (figurine.lineUp === "DDP") {
-        return "https://imagizer.imageshack.com/img923/9839/zPtgsH.png";
-    } else {
-        return "";
-    }
-}
-
 
 export default FigureView;
