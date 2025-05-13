@@ -1,14 +1,15 @@
 import axios from '../utils/axiosValidationInterceptor';
 import { formatAmount, formatDate } from '../utils/formatters';
-import { findColorByCategory, findMythClothLogoByLineUp } from '../utils/commons';
+import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine } from '../utils/commons';
 
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Divider, Skeleton, Stack, TextField, Tooltip } from "@mui/material";
-import { useState, useEffect } from "react";
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Divider, FormControl, FormHelperText, InputLabel, MenuItem, Select, Skeleton, Stack, TextField, Tooltip } from "@mui/material";
+import { useState, useEffect, useRef } from "react";
 
 import Grid from '@mui/material/Grid2';
 
 
 const FigureListing = ({ navigate }) => {
+    const allFigurinesRef = useRef(null);
     // State to store the flag to open and hide the dialog
     const [loading, setLoading] = useState(true);
     // State to store the list of figurines
@@ -16,12 +17,31 @@ const FigureListing = ({ navigate }) => {
     // State to store the list of figurine names
     const [figurineNames, setFigurineNames] = useState([]);
 
+    const [lineups, setLineups] = useState([]);
+    const [lineUpSelectedOption, setLineUpSelectedOption] = useState('');
+
     // Fetch the data when the component mounts
     useEffect(() => {
+        axios.get('/lineups')
+            .then(function (response) {
+                setLineups(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the lineUps", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the linesUps", error);
+                }
+            });
         axios.get('/figurines')
             .then(function (response) {
-                setFigurines(response.data); // Assume response.data is an array of objects
-                setFigurineNames(extractFigurineNames(response.data));
+                allFigurinesRef.current = response.data; // Stores the figurines here.
+
+                setFigurines(allFigurinesRef.current); // Assume response.data is an array of objects
+                setFigurineNames(extractFigurineNames(allFigurinesRef.current));
                 setLoading(false);
             }).catch(function (error) {
                 setLoading(true);
@@ -53,8 +73,13 @@ const FigureListing = ({ navigate }) => {
     const handleEnterKey = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault(); // Optional: prevent default form submission
-            //console.log('Typed value:', event.target.value);
+            const figurinesFiltered = allFigurinesRef.current.filter(f => f.displayableName.toLowerCase().includes(event.target.value.toLowerCase()));
+
+            setFigurines(figurinesFiltered);
         }
+    };
+    const handleLineUpSelectOnChange = (event) => {
+        setLineUpSelectedOption(event.target.value);
     };
 
     const handleClickOpen = (figurine) => {
@@ -94,6 +119,7 @@ const FigureListing = ({ navigate }) => {
                     disablePortal
                     options={figurineNames}
                     sx={{ width: 420 }}
+                    autoHighlight
                     renderInput={(params) => <TextField {...params} label="Find a figurine" onKeyDown={handleEnterKey} />}
                     slotProps={{
                         listbox: {
@@ -106,7 +132,27 @@ const FigureListing = ({ navigate }) => {
                         },
                     }}
                 />
-                <label>s</label>
+                <FormControl size="small" variant="outlined">
+                    <InputLabel id="line-up-label">Line Up</InputLabel>
+                    <Select
+                        labelId="line-up-label"
+                        label="Line Up"
+                        name="lineUp"
+                        value={lineUpSelectedOption}
+                        onChange={handleLineUpSelectOnChange}
+                    >
+                        {/* Render the MenuItem components based on the fetched data */}
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        {lineups.map((item) => (
+                            <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                {item.description}  {/* Display the item name, adjust to match your object structure */}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText>Choose an option</FormHelperText>
+                </FormControl>
             </Stack>
 
             <Grid container spacing={2}>
@@ -118,7 +164,7 @@ const FigureListing = ({ navigate }) => {
                         boxShadow: 'none', // remove default shadow if desired
                     }}>
                         <CardActionArea>
-                            {/* Background image */}
+                            {/* Figurine image */}
                             <CardMedia
                                 component="img"
                                 image={figurine.officialImages ? figurine.officialImages[0] : "-"}
@@ -137,7 +183,7 @@ const FigureListing = ({ navigate }) => {
                                         transform: 'scale(1.05)',
                                     }
                                 }} />
-                            {/* Logo overlay */}
+                            {/* Figurine Lineup */}
                             <Box
                                 component="img"
                                 src={findMythClothLogoByLineUp(figurine.lineUp)}
@@ -149,37 +195,38 @@ const FigureListing = ({ navigate }) => {
                                     width: 65
                                 }}
                             />
-                            {/* Ribbon */}
+                            {/* Ribbon Revival */}
                             {figurine.revival &&
                                 <Box
                                     sx={{
                                         position: 'absolute',
-                                        top: 16,
+                                        top: 10,
                                         right: -40,
-                                        backgroundColor: 'red',
-                                        color: 'white',
+                                        backgroundColor: findRevivalColorByFigurine(figurine.category),
+                                        color: '#1f1e25',
                                         padding: '4px 40px',
                                         transform: 'rotate(45deg)',
                                         fontWeight: 'bold',
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         zIndex: 1,
                                     }}
                                 >
                                     Revival
                                 </Box>
                             }
+                            {/* Ribbon Metal */}
                             {figurine.metal &&
                                 <Box
                                     sx={{
                                         position: 'absolute',
-                                        top: 16,
+                                        top: 10,
                                         right: -40,
                                         backgroundColor: '#38322b',
                                         color: '#efe8cb',
                                         padding: '4px 40px',
                                         transform: 'rotate(45deg)',
                                         fontWeight: 'bold',
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         zIndex: 1,
                                     }}
                                 >

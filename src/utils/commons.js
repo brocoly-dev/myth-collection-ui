@@ -9,7 +9,7 @@ const groupColorMap = new Map([
     ['SECONDARY', '#b7d2e4'],
     ['STEEL', '#999b9f'],
     ['SILVER', '#e3e0df'],
-    ['GOLD', '#f4e540'],
+    ['GOLD', '#fce551'],
     ['ROBE', '#647ce9'],
     ['SCALE', '#00a064'],
     ['GOD', '#ffffff'],
@@ -17,6 +17,10 @@ const groupColorMap = new Map([
     ['SPECTER', '#7e264c'],
     ['JUDGE', '#554d9e'],
     ['INHERITOR', '#fde833']
+]);
+
+const revivalColorMap = new Map([
+    ['GOLD', '#fccd2d']
 ]);
 
 const lineUpLogoMap = new Map([
@@ -44,6 +48,14 @@ export const findMythClothLogoByLineUp = (lineUp) => {
         return lineUpLogoMap.get(lineUp);
     } else {
         return "";
+    }
+};
+
+export const findRevivalColorByFigurine = (category) => {
+    if (category) {
+        return revivalColorMap.get(category) ?? "#e4e1e4";
+    } else {
+        return "#e4e1e4";
     }
 };
 
