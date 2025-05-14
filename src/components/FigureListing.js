@@ -97,7 +97,7 @@ const FigureListing = ({ navigate }) => {
             <Stack direction={"row"} spacing={2}>
                 <Grid container spacing={2}>
                     {Array.from({ length: 15 }).map((_, index) => (
-                        <Stack spacing={1}>
+                        <Stack key={index} spacing={1}>
                             <Skeleton variant="rectangular" width={200} height={240} />
                             <Skeleton variant="rectangular" width={200} height={70} />
                         </Stack>
@@ -157,7 +157,7 @@ const FigureListing = ({ navigate }) => {
 
             <Grid container spacing={2}>
                 {figurines.map((figurine) => (
-                    <Card sx={{
+                    <Card key={figurine.id} sx={{
                         minWidth: 200,
                         maxWidth: 200,
                         borderRadius: 1, // optional rounded corners

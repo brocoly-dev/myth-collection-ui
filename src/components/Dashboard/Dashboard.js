@@ -286,7 +286,7 @@ const Dashboard = () => {
                                         onChange={handleYearChange}>
 
                                         {allYears.map((year) => (
-                                            <MenuItem value={year}>{year}</MenuItem>
+                                            <MenuItem key={year} value={year}>{year}</MenuItem>
                                         ))}
                                     </TextField>
                                     <BarChartInfo title='Number of releases by year' dataset={datasetByYear} series={seriesByYear} />
@@ -306,7 +306,7 @@ const Dashboard = () => {
                             <Grid container spacing={2}>
                                 {/* Convert Map to Array and iterate */}
                                 {[...datasetByLineups.entries()].map(([lineup, data]) => (
-                                    <Grid width="100%">
+                                    <Grid key={lineup} width="100%">
                                         <LineChartInfo title={lineup} dataset={data} />
                                     </Grid>
                                 ))}
