@@ -2,7 +2,7 @@ import axios from '../utils/axiosValidationInterceptor';
 import { formatAmount, formatDate } from '../utils/formatters';
 import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine } from '../utils/commons';
 
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Divider, FormControl, FormHelperText, InputLabel, MenuItem, Select, Skeleton, Stack, TextField, Tooltip } from "@mui/material";
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, FormControl, FormHelperText, InputLabel, MenuItem, Select, Skeleton, Stack, TextField, Tooltip } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 
 import Grid from '@mui/material/Grid2';
@@ -16,6 +16,8 @@ const FigureListing = ({ navigate }) => {
     const [figurines, setFigurines] = useState([]);
     // State to store the list of figurine names
     const [figurineNames, setFigurineNames] = useState([]);
+    // State to store the number of figurines found
+    const [figurineCount, setFigurineCount] = useState(0);
 
     const [lineups, setLineups] = useState([]);
     const [lineUpSelectedOption, setLineUpSelectedOption] = useState('');
@@ -41,6 +43,7 @@ const FigureListing = ({ navigate }) => {
                 allFigurinesRef.current = response.data; // Stores the figurines here.
 
                 setFigurines(allFigurinesRef.current); // Assume response.data is an array of objects
+                setFigurineCount(allFigurinesRef.current.length);
                 setFigurineNames(extractFigurineNames(allFigurinesRef.current));
                 setLoading(false);
             }).catch(function (error) {
@@ -76,10 +79,25 @@ const FigureListing = ({ navigate }) => {
             const figurinesFiltered = allFigurinesRef.current.filter(f => f.displayableName.toLowerCase().includes(event.target.value.toLowerCase()));
 
             setFigurines(figurinesFiltered);
+            setFigurineCount(figurinesFiltered.length);
         }
     };
     const handleLineUpSelectOnChange = (event) => {
-        setLineUpSelectedOption(event.target.value);
+        const lineUpSelected = event.target.value;
+        if (lineUpSelected.length === 0) {
+            setLineUpSelectedOption(lineUpSelected);
+            setFigurines(allFigurinesRef.current);
+            setFigurineCount(allFigurinesRef.current.length);
+        } else {
+            const index = lineUpSelected.indexOf("|");
+            const lineUpValue = lineUpSelected.substring(0, index);
+
+            const figurinesFiltered = allFigurinesRef.current.filter(f => f.lineUp === lineUpValue);
+
+            setLineUpSelectedOption(lineUpSelected);
+            setFigurines(figurinesFiltered);
+            setFigurineCount(figurinesFiltered.length);
+        }
     };
 
     const handleClickOpen = (figurine) => {
@@ -88,7 +106,6 @@ const FigureListing = ({ navigate }) => {
 
     return loading ? (
         <Stack direction={"column"}
-            divider={<Divider orientation="horizontal" flexItem />}
             spacing={.5}
             sx={{
                 alignItems: "stretch"
@@ -107,7 +124,6 @@ const FigureListing = ({ navigate }) => {
         </Stack>
     ) : (
         <Stack direction={"column"}
-            divider={<Divider orientation="horizontal" flexItem />}
             spacing={.5}
             sx={{
                 alignItems: "stretch"
@@ -154,6 +170,8 @@ const FigureListing = ({ navigate }) => {
                     <FormHelperText>Choose an option</FormHelperText>
                 </FormControl>
             </Stack>
+
+            <label>{figurineCount} figurines found </label>
 
             <Grid container spacing={2}>
                 {figurines.map((figurine) => (
