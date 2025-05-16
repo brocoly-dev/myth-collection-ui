@@ -1,29 +1,66 @@
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, FormControl, InputLabel, MenuItem, Pagination, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import axios from '../utils/axiosValidationInterceptor';
+
+import { useState, useEffect } from "react";
+
+import Grid from '@mui/material/Grid2';
 import { formatAmount, formatDate } from '../utils/formatters';
 import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine } from '../utils/commons';
 
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, FormControl, FormHelperText, InputLabel, MenuItem, Select, Skeleton, Stack, TextField, Tooltip } from "@mui/material";
-import { useState, useEffect, useRef } from "react";
+import BasicBooleanFiltering from './BasicBooleanFiltering.js';
 
-import Grid from '@mui/material/Grid2';
-
-
-const FigureListing = ({ navigate }) => {
-    const allFigurinesRef = useRef(null);
-    // State to store the flag to open and hide the dialog
+const FigureListing = () => {
     const [loading, setLoading] = useState(true);
-    // State to store the list of figurines
     const [figurines, setFigurines] = useState([]);
-    // State to store the list of figurine names
+
+    // filter section
     const [figurineNames, setFigurineNames] = useState([]);
-    // State to store the number of figurines found
-    const [figurineCount, setFigurineCount] = useState(0);
+    const [figurineFinderValue, setFigurineFinderValue] = useState(null);
 
     const [lineups, setLineups] = useState([]);
     const [lineUpSelectedOption, setLineUpSelectedOption] = useState('');
 
+    const [categories, setCategories] = useState([]);
+    const [categorySelectedOption, setCategorySelectedOption] = useState('');
+
+    const [series, setSeries] = useState([]);
+    const [seriesSelectedOption, setSeriesSelectedOption] = useState('');
+
+    const [metalSelectedOption, setMetalSelectedOption] = useState('');
+    const [oceSelectedOption, setOceSelectedOption] = useState('');
+    const [revivalSelectedOption, setRevivalSelectedOption] = useState('');
+    const [hkSelectedOption, setHkSelectedOption] = useState('');
+    const [goldenSelectedOption, setGoldenSelectedOption] = useState('');
+    const [goldSelectedOption, setGoldSelectedOption] = useState('');
+    const [brokenSelectedOption, setBrokenSelectedOption] = useState('');
+    const [plainSelectedOption, setPlainSelectedOption] = useState('');
+    const [comicSelectedOption, setComicSelectedOption] = useState('');
+    const [setSelectedOption, setSetSelectedOption] = useState('');
+
+    // Pagination section
+    const MAX_RECORDS_PER_PAGE = 30;
+    const [page, setPage] = useState(1);
+
+
     // Fetch the data when the component mounts
     useEffect(() => {
+        axios.get('/figurines')
+            .then(function (response) {
+                setFigurines(response.data); // Assume response.data is an array of objects
+                setFigurineNames(extractFigurineNames(response.data));
+                setLoading(false);
+            }).catch(function (error) {
+                setLoading(true);
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the figurines", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the figurines", error);
+                }
+            });
         axios.get('/lineups')
             .then(function (response) {
                 setLineups(response.data);  // Assume response.data is an array of objects
@@ -38,184 +75,349 @@ const FigureListing = ({ navigate }) => {
                     console.error("Error getting the linesUps", error);
                 }
             });
-        axios.get('/figurines')
+        axios.get('/categories')
             .then(function (response) {
-                allFigurinesRef.current = response.data; // Stores the figurines here.
-
-                setFigurines(allFigurinesRef.current); // Assume response.data is an array of objects
-                setFigurineCount(allFigurinesRef.current.length);
-                setFigurineNames(extractFigurineNames(allFigurinesRef.current));
-                setLoading(false);
+                setCategories(response.data);  // Assume response.data is an array of objects
             }).catch(function (error) {
-                setLoading(true);
                 // If the error is a validation error from backend
                 if (error.response && error.response.data) {
                     // handle error
                     const backendErrors = error.response.data;
-                    console.error("Error retrieving the figurines", backendErrors);
+                    console.error("Error retrieving the categories", backendErrors);
                 } else {
                     // Handle other errors (e.g., network issues)
-                    console.error("Error getting the figurines", error);
+                    console.error("Error getting the categories", error);
+                }
+            });
+        axios.get('/series')
+            .then(function (response) {
+                setSeries(response.data);  // Assume response.data is an array of objects
+            }).catch(function (error) {
+                // If the error is a validation error from backend
+                if (error.response && error.response.data) {
+                    // handle error
+                    const backendErrors = error.response.data;
+                    console.error("Error retrieving the series", backendErrors);
+                } else {
+                    // Handle other errors (e.g., network issues)
+                    console.error("Error getting the series", error);
                 }
             });
     }, []); // Empty dependency array means this runs once when the component mounts
 
 
-    function extractFigurineNames(figurines) {
+
+    // filter by text
+    let filteredFigurines = figurineFinderValue === null ? figurines : figurines.filter(f => f.displayableName.toLowerCase().includes(figurineFinderValue.toLowerCase()));
+    // filter by lineUp
+    if (lineUpSelectedOption.length !== 0) {
+        const index = lineUpSelectedOption.indexOf("|");
+        const lineUpValue = lineUpSelectedOption.substring(0, index);
+        filteredFigurines = filteredFigurines.filter(f => f.lineUp === lineUpValue);
+    }
+    // filter by category
+    if (categorySelectedOption.length !== 0) {
+        const index = categorySelectedOption.indexOf("|");
+        const categoryValue = categorySelectedOption.substring(0, index);
+        filteredFigurines = filteredFigurines.filter(f => f.category === categoryValue);
+    }
+    // filter by series
+    if (seriesSelectedOption.length !== 0) {
+        const index = seriesSelectedOption.indexOf("|");
+        const seriesValue = seriesSelectedOption.substring(0, index);
+        filteredFigurines = filteredFigurines.filter(f => f.series === seriesValue);
+    }
+    // filter by metal
+    if (metalSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.metal.toString() === metalSelectedOption);
+    }
+    // filter by oce
+    if (oceSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.oce.toString() === oceSelectedOption);
+    }
+    // filter by revival
+    if (revivalSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.revival.toString() === revivalSelectedOption);
+    }
+    // filter by hk
+    if (hkSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.hk.toString() === hkSelectedOption);
+    }
+    // filter by golden
+    if (goldenSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.golden.toString() === goldenSelectedOption);
+    }
+    // filter by gold
+    if (goldSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.gold.toString() === goldSelectedOption);
+    }
+    // filter by broken
+    if (brokenSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.broken.toString() === brokenSelectedOption);
+    }
+    // filter by plain
+    if (plainSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.plain.toString() === plainSelectedOption);
+    }
+    // filter by comic
+    if (comicSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.comic.toString() === comicSelectedOption);
+    }
+    // filter by set
+    if (setSelectedOption.length !== 0) {
+        filteredFigurines = filteredFigurines.filter(f => f.set.toString() === setSelectedOption);
+    }
+
+
+    const displayableFigurinesPerPage = filteredFigurines.slice(
+        (page - 1) * MAX_RECORDS_PER_PAGE,
+        page * MAX_RECORDS_PER_PAGE
+    );
+
+    const extractFigurineNames = (figurines) => {
         const allNames = figurines.map(f => f.displayableName);
         const uniqueNames = [...new Set(allNames)].sort((a, b) =>
             a.toLowerCase().localeCompare(b.toLowerCase())
         );
-
-        return uniqueNames
-            .map(name => ({
-                label: name
-            }));
+        return uniqueNames;
     }
 
-    const handleEnterKey = (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Optional: prevent default form submission
-            const figurinesFiltered = allFigurinesRef.current.filter(f => f.displayableName.toLowerCase().includes(event.target.value.toLowerCase()));
-
-            setFigurines(figurinesFiltered);
-            setFigurineCount(figurinesFiltered.length);
-        }
-    };
-    const handleLineUpSelectOnChange = (event) => {
-        const lineUpSelected = event.target.value;
-        if (lineUpSelected.length === 0) {
-            setLineUpSelectedOption(lineUpSelected);
-            setFigurines(allFigurinesRef.current);
-            setFigurineCount(allFigurinesRef.current.length);
-        } else {
-            const index = lineUpSelected.indexOf("|");
-            const lineUpValue = lineUpSelected.substring(0, index);
-
-            const figurinesFiltered = allFigurinesRef.current.filter(f => f.lineUp === lineUpValue);
-
-            setLineUpSelectedOption(lineUpSelected);
-            setFigurines(figurinesFiltered);
-            setFigurineCount(figurinesFiltered.length);
-        }
-    };
-
-    const handleClickOpen = (figurine) => {
-        navigate('/mythcloth/figurine-' + figurine.id);
-    };
-
     return loading ? (
-        <Stack direction={"column"}
-            spacing={.5}
-            sx={{
-                alignItems: "stretch"
-            }}
-        >
-            <Stack direction={"row"} spacing={2}>
-                <Grid container spacing={2}>
-                    {Array.from({ length: 15 }).map((_, index) => (
-                        <Stack key={index} spacing={1}>
-                            <Skeleton variant="rectangular" width={200} height={240} />
-                            <Skeleton variant="rectangular" width={200} height={70} />
-                        </Stack>
-                    ))}
-                </Grid>
-            </Stack>
-        </Stack>
+        <label>s</label>
     ) : (
-        <Stack direction={"column"}
-            spacing={.5}
-            sx={{
-                alignItems: "stretch"
-            }}
+        <Stack
+            direction="column"
+            spacing={0}
+            sx={{ border: '1px solid gray', padding: 0, alignItems: "stretch" }}
         >
-            <Stack direction={"row"} spacing={2}>
-                <Autocomplete
-                    size="small"
-                    disablePortal
-                    options={figurineNames}
-                    sx={{ width: 420 }}
-                    autoHighlight
-                    renderInput={(params) => <TextField {...params} label="Find a figurine" onKeyDown={handleEnterKey} />}
-                    slotProps={{
-                        listbox: {
-                            style: {
-                                whiteSpace: 'nowrap',         // Prevent wrapping
-                                //overflow: 'hidden',           // Hide overflow
-                                textOverflow: 'ellipsis',     // Show ellipsis
-                                maxWidth: '100%',             // Ensure it doesn't overflow container
-                            },
-                        },
-                    }}
-                />
-                <FormControl size="small" variant="outlined">
-                    <InputLabel id="line-up-label">Line Up</InputLabel>
-                    <Select
-                        labelId="line-up-label"
-                        label="Line Up"
-                        name="lineUp"
-                        value={lineUpSelectedOption}
-                        onChange={handleLineUpSelectOnChange}
-                    >
-                        {/* Render the MenuItem components based on the fetched data */}
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        {lineups.map((item) => (
-                            <MenuItem key={item.key} value={item.key + '|' + item.description}>
-                                {item.description}  {/* Display the item name, adjust to match your object structure */}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <FormHelperText>Choose an option</FormHelperText>
-                </FormControl>
-            </Stack>
-
-            <label>{figurineCount} figurines found </label>
-
-            <Grid container spacing={2}>
-                {figurines.map((figurine) => (
-                    <Card key={figurine.id} sx={{
-                        minWidth: 200,
-                        maxWidth: 200,
-                        borderRadius: 1, // optional rounded corners
-                        boxShadow: 'none', // remove default shadow if desired
-                    }}>
-                        <CardActionArea>
-                            {/* Figurine image */}
-                            <CardMedia
-                                component="img"
-                                image={figurine.officialImages ? figurine.officialImages[0] : "-"}
-                                onDoubleClick={() => handleClickOpen(figurine)}
-                                sx={{
-                                    cursor: 'pointer',
-                                    border: '2.5px solid ' + findColorByCategory(figurine.category),
-                                    width: '200px',
-                                    height: '260px',
-                                    objectFit: 'cover', // crop to fill
-                                    filter: figurine.status === 'UNRELEASED' || figurine.status === 'RELEASE_TBD' ? 'grayscale(100%)' : 'none',
-                                    transform: 'scale(1)',
-                                    transition: 'filter 0.4s ease, transform 0.4s ease',
-                                    '&:hover': {
-                                        filter: 'none',
-                                        transform: 'scale(1.05)',
-                                    }
-                                }} />
-                            {/* Figurine Lineup */}
-                            <Box
-                                component="img"
-                                src={findMythClothLogoByLineUp(figurine.lineUp)}
-                                alt="Logo"
-                                sx={{
-                                    position: 'absolute',
-                                    top: 7,
-                                    left: 5,
-                                    width: 65
+            <Box sx={{ border: '1px solid gray', padding: 0 }} >
+                <Grid container spacing={1.5}>
+                    <Autocomplete
+                        id="free-solo-id"
+                        freeSolo
+                        size="small"
+                        options={figurineNames}
+                        value={figurineFinderValue}
+                        onChange={(event, newValue) => {
+                            setFigurineFinderValue(newValue);
+                        }}
+                        sx={{ width: 360 }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Find a figurine"
+                                slotProps={{
+                                    input: {
+                                        ...params.InputProps,
+                                        type: 'search',
+                                    },
                                 }}
                             />
-                            {/* Ribbon Revival */}
-                            {figurine.revival &&
+                        )}
+                    />
+                    <FormControl size="small" variant="outlined">
+                        <InputLabel id="line-up-label">Line Up</InputLabel>
+                        <Select
+                            labelId="line-up-label"
+                            label="Line Up"
+                            name="lineUp"
+                            sx={{ width: 360 }}
+                            value={lineUpSelectedOption}
+                            onChange={(event) => {
+                                setLineUpSelectedOption(event.target.value);
+                            }}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>All</em>
+                            </MenuItem>
+                            {lineups.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size="small" variant="outlined">
+                        <InputLabel id="category-label">Group</InputLabel>
+                        <Select
+                            labelId="category-label"
+                            label="Group"
+                            name="group"
+                            sx={{ width: 360 }}
+                            value={categorySelectedOption}
+                            onChange={(event) => {
+                                setCategorySelectedOption(event.target.value);
+                            }}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>All</em>
+                            </MenuItem>
+                            {categories.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size="small" variant="outlined">
+                        <InputLabel id="series-label">Series</InputLabel>
+                        <Select
+                            labelId="series-label"
+                            label="Series"
+                            name="series"
+                            sx={{ width: 360 }}
+                            value={seriesSelectedOption}
+                            onChange={(event) => {
+                                setSeriesSelectedOption(event.target.value);
+                            }}
+                        >
+                            {/* Render the MenuItem components based on the fetched data */}
+                            <MenuItem value="">
+                                <em>All</em>
+                            </MenuItem>
+                            {series.map((item) => (
+                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <BasicBooleanFiltering
+                        id="metal"
+                        label="Metal Body"
+                        trueValue='EX Metal Body'
+                        falseValue='Regular Body'
+                        valueSelected={metalSelectedOption}
+                        onChangeFiltering={(newValue) => { setMetalSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="oce"
+                        label="OCE"
+                        trueValue='Original Color Edition'
+                        falseValue='Regular Color'
+                        valueSelected={oceSelectedOption}
+                        onChangeFiltering={(newValue) => { setOceSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="revival"
+                        label="Revival Version"
+                        trueValue='Revival Edition'
+                        falseValue='Non-revival'
+                        valueSelected={revivalSelectedOption}
+                        onChangeFiltering={(newValue) => { setRevivalSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="hk"
+                        label="Hong Kong Ed."
+                        trueValue='Hk Edition'
+                        falseValue='JP Edition'
+                        valueSelected={hkSelectedOption}
+                        onChangeFiltering={(newValue) => { setHkSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="golden"
+                        label="Golden Version"
+                        trueValue='Golden'
+                        falseValue='Regular'
+                        valueSelected={goldenSelectedOption}
+                        onChangeFiltering={(newValue) => { setGoldenSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="gold"
+                        label="True Gold Version"
+                        trueValue='18K or 24K'
+                        falseValue='Regular'
+                        valueSelected={goldSelectedOption}
+                        onChangeFiltering={(newValue) => { setGoldSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="broken"
+                        label="Broken Armor"
+                        trueValue='Broken'
+                        falseValue='Non-broken'
+                        valueSelected={brokenSelectedOption}
+                        onChangeFiltering={(newValue) => { setBrokenSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="plain"
+                        label="Plain Cloth"
+                        trueValue='Plain Cloth'
+                        falseValue='Non-Plain Cloth'
+                        valueSelected={plainSelectedOption}
+                        onChangeFiltering={(newValue) => { setPlainSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="comic"
+                        label="Manga version"
+                        trueValue='Manga'
+                        falseValue='Non-manga'
+                        valueSelected={comicSelectedOption}
+                        onChangeFiltering={(newValue) => { setComicSelectedOption(newValue); }}
+                    />
+                    <BasicBooleanFiltering
+                        id="set"
+                        label="Comes as a Set"
+                        trueValue='yes'
+                        falseValue='no'
+                        valueSelected={setSelectedOption}
+                        onChangeFiltering={(newValue) => { setSetSelectedOption(newValue); }}
+                    />
+                </Grid>
+            </Box>
+            <Box sx={{ border: '1px solid gray', padding: 0 }} >
+                <Typography variant='caption'>
+                    {filteredFigurines.length} figurines found
+                </Typography>
+            </Box>
+            <Box sx={{
+                border: '1px solid gray',
+                padding: 0,
+                height: '68vh',
+                overflow: 'auto',           // Enables scrollbars when content overflows
+            }} >
+                <Grid container spacing={4.5}>
+                    {displayableFigurinesPerPage.map((figurine) => (
+                        <Card key={figurine.id} sx={{
+                            minWidth: 200,
+                            maxWidth: 200,
+                            borderRadius: 1, // optional rounded corners
+                            boxShadow: 'none', // remove default shadow if desired
+                        }}>
+                            <CardActionArea>
+                                {/* Figurine image */}
+                                <CardMedia
+                                    component="img"
+                                    image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        border: '2.5px solid ' + findColorByCategory(figurine.category),
+                                        width: '200px',
+                                        height: '260px',
+                                        objectFit: 'cover', // crop to fill
+                                        filter: figurine.status === 'UNRELEASED' || figurine.status === 'RELEASE_TBD' ? 'grayscale(100%)' : 'none',
+                                        transform: 'scale(1)',
+                                        transition: 'filter 0.4s ease, transform 0.4s ease',
+                                        '&:hover': {
+                                            filter: 'none',
+                                            transform: 'scale(1.05)',
+                                        }
+                                    }} />
+                                {/* Figurine Lineup */}
                                 <Box
+                                    component="img"
+                                    src={findMythClothLogoByLineUp(figurine.lineUp)}
+                                    alt="Logo"
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 7,
+                                        left: 5,
+                                        width: 65
+                                    }}
+                                />
+                                {/* Ribbon Revival */}
+                                {figurine.revival && <Box
                                     sx={{
                                         position: 'absolute',
                                         top: 10,
@@ -231,58 +433,62 @@ const FigureListing = ({ navigate }) => {
                                 >
                                     Revival
                                 </Box>
-                            }
-                            {/* Ribbon Metal */}
-                            {figurine.metal &&
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 10,
-                                        right: -40,
-                                        backgroundColor: '#38322b',
-                                        color: '#efe8cb',
-                                        padding: '4px 40px',
-                                        transform: 'rotate(45deg)',
-                                        fontWeight: 'bold',
-                                        fontSize: 10,
-                                        zIndex: 1,
-                                    }}
-                                >
-                                    EX Metal
-                                </Box>
-                            }
-                            <CardContent>
-                                <Tooltip title={figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" || figurine.status === "FUTURE_RELEASE" ? "" :
-                                    (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))
-                                }>
-                                    <b>
-                                        {figurine.displayableName}
-                                        <br />
-                                        {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
-                                    </b>
-                                    {figurine.status === "FUTURE_RELEASE" ?
-                                        <>
-                                            <p />
-                                            <div style={{ fontSize: '10px' }}>
-                                                Scheduled for released in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
-                                            </div>
-                                        </>
-                                        : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
-                                            <>
-                                                <p />
-                                                <div style={{ fontSize: '10px' }}>
+                                }
+                                {/* Ribbon Metal */}
+                                {figurine.metal &&
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 10,
+                                            right: -40,
+                                            backgroundColor: '#38322b',
+                                            color: '#efe8cb',
+                                            padding: '4px 40px',
+                                            transform: 'rotate(45deg)',
+                                            fontWeight: 'bold',
+                                            fontSize: 10,
+                                            zIndex: 1,
+                                        }}
+                                    >
+                                        EX Metal
+                                    </Box>
+                                }
+                                <CardContent>
+                                    <Tooltip title={figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" || figurine.status === "FUTURE_RELEASE" ? "" :
+                                        (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))
+                                    }>
+                                        <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                            {figurine.displayableName}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                            {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
+                                        </Typography>
+                                        {figurine.status === "FUTURE_RELEASE" ?
+                                            <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
+                                                Scheduled for release in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
+                                            </Typography>
+                                            : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
+                                                <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
                                                     First appearance in {formatDate(figurine.distributionJPY.firstAnnouncementDate, true)}
-                                                </div>
-                                            </>
-                                            : ""}
-                                </Tooltip>
-                            </CardContent>
-                        </CardActionArea>
-                    </Card>
-                ))}
-            </Grid>
+                                                </Typography>
+                                                : ""}
+                                    </Tooltip>
+                                </CardContent>
+                            </CardActionArea>
+                        </Card>
+                    ))}
+                </Grid>
+            </Box>
+            <Box sx={{ border: '0px solid gray', paddingTop: 1 }} >
+                <Pagination count={Math.ceil(filteredFigurines.length / MAX_RECORDS_PER_PAGE)}
+                    page={page}
+                    onChange={(event, value) => {
+                        setPage(value);
+                    }}
+                    color="primary"
+                    showFirstButton showLastButton />
+            </Box>
         </Stack>
     );
 };
-
 export default FigureListing;
