@@ -1,7 +1,10 @@
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, FormControl, InputLabel, MenuItem, Pagination, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import axios from '../utils/axiosValidationInterceptor';
 
 import { useState, useEffect } from "react";
+
+import OpenFilterIcon from '@mui/icons-material/FilterList';
+import HideFilterIcon from '@mui/icons-material/FilterListOff';
 
 import Grid from '@mui/material/Grid2';
 import { formatAmount, formatDate } from '../utils/formatters';
@@ -9,11 +12,13 @@ import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigur
 
 import BasicBooleanFiltering from './BasicBooleanFiltering.js';
 
-const FigureListing = () => {
+const FigureListing = ({ navigate }) => {
     const [loading, setLoading] = useState(true);
     const [figurines, setFigurines] = useState([]);
 
     // filter section
+    const [showFilters, setShowFilters] = useState(false);
+
     const [figurineNames, setFigurineNames] = useState([]);
     const [figurineFinderValue, setFigurineFinderValue] = useState(null);
 
@@ -182,199 +187,212 @@ const FigureListing = () => {
         return uniqueNames;
     }
 
+    const handleClickOpen = (figurine) => {
+        navigate('/mythcloth/figurine-' + figurine.id);
+    };
+
     return loading ? (
         <label>s</label>
     ) : (
         <Stack
             direction="column"
             spacing={0}
-            sx={{ border: '1px solid gray', padding: 0, alignItems: "stretch" }}
+            sx={{ border: '0px solid gray', padding: 0, alignItems: "stretch" }}
         >
-            <Box sx={{ border: '1px solid gray', padding: 0 }} >
-                <Grid container spacing={1.5}>
-                    <Autocomplete
-                        id="free-solo-id"
-                        freeSolo
-                        size="small"
-                        options={figurineNames}
-                        value={figurineFinderValue}
-                        onChange={(event, newValue) => {
-                            setFigurineFinderValue(newValue);
-                        }}
-                        sx={{ width: 360 }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Find a figurine"
-                                slotProps={{
-                                    input: {
-                                        ...params.InputProps,
-                                        type: 'search',
-                                    },
-                                }}
-                            />
-                        )}
-                    />
-                    <FormControl size="small" variant="outlined">
-                        <InputLabel id="line-up-label">Line Up</InputLabel>
-                        <Select
-                            labelId="line-up-label"
-                            label="Line Up"
-                            name="lineUp"
-                            sx={{ width: 360 }}
-                            value={lineUpSelectedOption}
-                            onChange={(event) => {
-                                setLineUpSelectedOption(event.target.value);
-                            }}
-                        >
-                            {/* Render the MenuItem components based on the fetched data */}
-                            <MenuItem value="">
-                                <em>All</em>
-                            </MenuItem>
-                            {lineups.map((item) => (
-                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
-                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl size="small" variant="outlined">
-                        <InputLabel id="category-label">Group</InputLabel>
-                        <Select
-                            labelId="category-label"
-                            label="Group"
-                            name="group"
-                            sx={{ width: 360 }}
-                            value={categorySelectedOption}
-                            onChange={(event) => {
-                                setCategorySelectedOption(event.target.value);
-                            }}
-                        >
-                            {/* Render the MenuItem components based on the fetched data */}
-                            <MenuItem value="">
-                                <em>All</em>
-                            </MenuItem>
-                            {categories.map((item) => (
-                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
-                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl size="small" variant="outlined">
-                        <InputLabel id="series-label">Series</InputLabel>
-                        <Select
-                            labelId="series-label"
-                            label="Series"
-                            name="series"
-                            sx={{ width: 360 }}
-                            value={seriesSelectedOption}
-                            onChange={(event) => {
-                                setSeriesSelectedOption(event.target.value);
-                            }}
-                        >
-                            {/* Render the MenuItem components based on the fetched data */}
-                            <MenuItem value="">
-                                <em>All</em>
-                            </MenuItem>
-                            {series.map((item) => (
-                                <MenuItem key={item.key} value={item.key + '|' + item.description}>
-                                    {item.description}  {/* Display the item name, adjust to match your object structure */}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <BasicBooleanFiltering
-                        id="metal"
-                        label="Metal Body"
-                        trueValue='EX Metal Body'
-                        falseValue='Regular Body'
-                        valueSelected={metalSelectedOption}
-                        onChangeFiltering={(newValue) => { setMetalSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="oce"
-                        label="OCE"
-                        trueValue='Original Color Edition'
-                        falseValue='Regular Color'
-                        valueSelected={oceSelectedOption}
-                        onChangeFiltering={(newValue) => { setOceSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="revival"
-                        label="Revival Version"
-                        trueValue='Revival Edition'
-                        falseValue='Non-revival'
-                        valueSelected={revivalSelectedOption}
-                        onChangeFiltering={(newValue) => { setRevivalSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="hk"
-                        label="Hong Kong Ed."
-                        trueValue='Hk Edition'
-                        falseValue='JP Edition'
-                        valueSelected={hkSelectedOption}
-                        onChangeFiltering={(newValue) => { setHkSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="golden"
-                        label="Golden Version"
-                        trueValue='Golden'
-                        falseValue='Regular'
-                        valueSelected={goldenSelectedOption}
-                        onChangeFiltering={(newValue) => { setGoldenSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="gold"
-                        label="True Gold Version"
-                        trueValue='18K or 24K'
-                        falseValue='Regular'
-                        valueSelected={goldSelectedOption}
-                        onChangeFiltering={(newValue) => { setGoldSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="broken"
-                        label="Broken Armor"
-                        trueValue='Broken'
-                        falseValue='Non-broken'
-                        valueSelected={brokenSelectedOption}
-                        onChangeFiltering={(newValue) => { setBrokenSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="plain"
-                        label="Plain Cloth"
-                        trueValue='Plain Cloth'
-                        falseValue='Non-Plain Cloth'
-                        valueSelected={plainSelectedOption}
-                        onChangeFiltering={(newValue) => { setPlainSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="comic"
-                        label="Manga version"
-                        trueValue='Manga'
-                        falseValue='Non-manga'
-                        valueSelected={comicSelectedOption}
-                        onChangeFiltering={(newValue) => { setComicSelectedOption(newValue); }}
-                    />
-                    <BasicBooleanFiltering
-                        id="set"
-                        label="Comes as a Set"
-                        trueValue='yes'
-                        falseValue='no'
-                        valueSelected={setSelectedOption}
-                        onChangeFiltering={(newValue) => { setSetSelectedOption(newValue); }}
-                    />
-                </Grid>
+            <Box sx={{ border: '0px solid gray', padding: 0, display: 'flex', justifyContent: 'flex-start' }} >
+                <Tooltip title={showFilters ? "Hide filters" : "Show filter options"}>
+                    <IconButton onClick={() => setShowFilters(prev => !prev)} aria-label="Toggle Filters">
+                        {showFilters ? <HideFilterIcon /> : <OpenFilterIcon />}
+                    </IconButton>
+                </Tooltip>
             </Box>
-            <Box sx={{ border: '1px solid gray', padding: 0 }} >
+            <Collapse in={showFilters} timeout="auto">
+                <Box sx={{ border: '0px solid gray', padding: 0 }} >
+                    <Grid container spacing={1.5}>
+                        <Autocomplete
+                            id="free-solo-id"
+                            freeSolo
+                            size="small"
+                            options={figurineNames}
+                            value={figurineFinderValue}
+                            onChange={(event, newValue) => {
+                                setFigurineFinderValue(newValue);
+                            }}
+                            sx={{ width: 360 }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Find a figurine"
+                                    slotProps={{
+                                        input: {
+                                            ...params.InputProps,
+                                            type: 'search',
+                                        },
+                                    }}
+                                />
+                            )}
+                        />
+                        <FormControl size="small" variant="outlined">
+                            <InputLabel id="line-up-label">Line Up</InputLabel>
+                            <Select
+                                labelId="line-up-label"
+                                label="Line Up"
+                                name="lineUp"
+                                sx={{ width: 360 }}
+                                value={lineUpSelectedOption}
+                                onChange={(event) => {
+                                    setLineUpSelectedOption(event.target.value);
+                                }}
+                            >
+                                {/* Render the MenuItem components based on the fetched data */}
+                                <MenuItem value="">
+                                    <em>All</em>
+                                </MenuItem>
+                                {lineups.map((item) => (
+                                    <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                        {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl size="small" variant="outlined">
+                            <InputLabel id="category-label">Group</InputLabel>
+                            <Select
+                                labelId="category-label"
+                                label="Group"
+                                name="group"
+                                sx={{ width: 360 }}
+                                value={categorySelectedOption}
+                                onChange={(event) => {
+                                    setCategorySelectedOption(event.target.value);
+                                }}
+                            >
+                                {/* Render the MenuItem components based on the fetched data */}
+                                <MenuItem value="">
+                                    <em>All</em>
+                                </MenuItem>
+                                {categories.map((item) => (
+                                    <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                        {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl size="small" variant="outlined">
+                            <InputLabel id="series-label">Series</InputLabel>
+                            <Select
+                                labelId="series-label"
+                                label="Series"
+                                name="series"
+                                sx={{ width: 360 }}
+                                value={seriesSelectedOption}
+                                onChange={(event) => {
+                                    setSeriesSelectedOption(event.target.value);
+                                }}
+                            >
+                                {/* Render the MenuItem components based on the fetched data */}
+                                <MenuItem value="">
+                                    <em>All</em>
+                                </MenuItem>
+                                {series.map((item) => (
+                                    <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                        {item.description}  {/* Display the item name, adjust to match your object structure */}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <BasicBooleanFiltering
+                            id="metal"
+                            label="Metal Body"
+                            trueValue='EX Metal Body'
+                            falseValue='Regular Body'
+                            valueSelected={metalSelectedOption}
+                            onChangeFiltering={(newValue) => { setMetalSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="oce"
+                            label="OCE"
+                            trueValue='Original Color Edition'
+                            falseValue='Regular Color'
+                            valueSelected={oceSelectedOption}
+                            onChangeFiltering={(newValue) => { setOceSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="revival"
+                            label="Revival Version"
+                            trueValue='Revival Edition'
+                            falseValue='Non-revival'
+                            valueSelected={revivalSelectedOption}
+                            onChangeFiltering={(newValue) => { setRevivalSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="hk"
+                            label="Hong Kong Ed."
+                            trueValue='Hk Edition'
+                            falseValue='JP Edition'
+                            valueSelected={hkSelectedOption}
+                            onChangeFiltering={(newValue) => { setHkSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="golden"
+                            label="Golden Version"
+                            trueValue='Golden'
+                            falseValue='Regular'
+                            valueSelected={goldenSelectedOption}
+                            onChangeFiltering={(newValue) => { setGoldenSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="gold"
+                            label="True Gold Version"
+                            trueValue='18K or 24K'
+                            falseValue='Regular'
+                            valueSelected={goldSelectedOption}
+                            onChangeFiltering={(newValue) => { setGoldSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="broken"
+                            label="Broken Armor"
+                            trueValue='Broken'
+                            falseValue='Non-broken'
+                            valueSelected={brokenSelectedOption}
+                            onChangeFiltering={(newValue) => { setBrokenSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="plain"
+                            label="Plain Cloth"
+                            trueValue='Plain Cloth'
+                            falseValue='Non-Plain Cloth'
+                            valueSelected={plainSelectedOption}
+                            onChangeFiltering={(newValue) => { setPlainSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="comic"
+                            label="Manga version"
+                            trueValue='Manga'
+                            falseValue='Non-manga'
+                            valueSelected={comicSelectedOption}
+                            onChangeFiltering={(newValue) => { setComicSelectedOption(newValue); }}
+                        />
+                        <BasicBooleanFiltering
+                            id="set"
+                            label="Comes as a Set"
+                            trueValue='yes'
+                            falseValue='no'
+                            valueSelected={setSelectedOption}
+                            onChangeFiltering={(newValue) => { setSetSelectedOption(newValue); }}
+                        />
+                    </Grid>
+                </Box>
+            </Collapse>
+            <Box sx={{ border: '0px solid gray', padding: 1 }} >
                 <Typography variant='caption'>
                     {filteredFigurines.length} figurines found
                 </Typography>
             </Box>
             <Box sx={{
-                border: '1px solid gray',
+                border: '0px solid gray',
                 padding: 0,
-                height: '68vh',
+                height: '60vh',
                 overflow: 'auto',           // Enables scrollbars when content overflows
             }} >
                 <Grid container spacing={4.5}>
@@ -390,6 +408,7 @@ const FigureListing = () => {
                                 <CardMedia
                                     component="img"
                                     image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                    onDoubleClick={() => handleClickOpen(figurine)}
                                     sx={{
                                         cursor: 'pointer',
                                         border: '2.5px solid ' + findColorByCategory(figurine.category),
