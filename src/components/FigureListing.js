@@ -420,17 +420,35 @@ const FigureListing = ({ navigate }) => {
                 {loading ?
                     <Grid container spacing={4.5}>
                         {Array.from({ length: 30 }).map((_, index) => (
-                            <Skeleton key={index} variant="rectangular" width={200} height={330} />
+                            <Skeleton key={index} variant="rectangular"
+                                sx={{
+                                    width: {
+                                        xs: '100%',
+                                        md: 200
+                                    },
+                                    height: {
+                                        xs: 475,
+                                        md: 330
+                                    }
+                                }}
+                            />
                         ))}
                     </Grid>
                     :
-                    <Grid container spacing={4.5}>
+                    <Grid container spacing={4.5} sx={{ border: '0px solid red' }}>
                         {displayableFigurinesPerPage.map((figurine) => (
                             <Card key={figurine.id} sx={{
-                                minWidth: 200,
-                                maxWidth: 200,
+                                minWidth: {
+                                    xs: '100%',    // small devices
+                                    md: 200        // fixed width starting from mid and up (≥900px)
+                                },
+                                maxWidth: {
+                                    xs: '100%',    // small devices
+                                    md: 200        // fixed width starting from mid and up (≥900px)
+                                },
                                 borderRadius: 1, // optional rounded corners
                                 boxShadow: 'none', // remove default shadow if desired
+                                border: '0px solid blue'
                             }}>
                                 <CardActionArea>
                                     {/* Figurine image */}
@@ -441,8 +459,14 @@ const FigureListing = ({ navigate }) => {
                                         sx={{
                                             cursor: 'pointer',
                                             border: '2.5px solid ' + findColorByCategory(figurine.category),
-                                            width: '200px',
-                                            height: '260px',
+                                            width: {
+                                                xs: '100%',
+                                                md: 200
+                                            },
+                                            height: {
+                                                xs: '100%',
+                                                md: 260
+                                            },
                                             objectFit: 'cover', // crop to fill
                                             filter: figurine.status === 'UNRELEASED' || figurine.status === 'RELEASE_TBD' ? 'grayscale(100%)' : 'none',
                                             transform: 'scale(1)',
@@ -461,7 +485,7 @@ const FigureListing = ({ navigate }) => {
                                             position: 'absolute',
                                             top: 7,
                                             left: 5,
-                                            width: 65
+                                            width: '30%'
                                         }}
                                     />
                                     {/* Ribbon Revival */}
