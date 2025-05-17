@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import axios from '../utils/axiosValidationInterceptor';
 
 import { useState, useEffect } from "react";
@@ -215,9 +215,7 @@ const FigureListing = ({ navigate }) => {
         }
     }
 
-    return loading ? (
-        <label>s</label>
-    ) : (
+    return (
         <Stack
             direction="column"
             spacing={0}
@@ -410,7 +408,7 @@ const FigureListing = ({ navigate }) => {
             </Collapse>
             <Box sx={{ border: '0px solid gray', padding: 1 }} >
                 <Typography variant='caption'>
-                    {calculateTotalFigurines(filteredFigurines)}
+                    {loading ? <Skeleton /> : calculateTotalFigurines(filteredFigurines)}
                 </Typography>
             </Box>
             <Box sx={{
@@ -419,73 +417,61 @@ const FigureListing = ({ navigate }) => {
                 height: '60vh',
                 overflow: 'auto',           // Enables scrollbars when content overflows
             }} >
-                <Grid container spacing={4.5}>
-                    {displayableFigurinesPerPage.map((figurine) => (
-                        <Card key={figurine.id} sx={{
-                            minWidth: 200,
-                            maxWidth: 200,
-                            borderRadius: 1, // optional rounded corners
-                            boxShadow: 'none', // remove default shadow if desired
-                        }}>
-                            <CardActionArea>
-                                {/* Figurine image */}
-                                <CardMedia
-                                    component="img"
-                                    image={figurine.officialImages ? figurine.officialImages[0] : "-"}
-                                    onDoubleClick={() => handleClickOpen(figurine)}
-                                    sx={{
-                                        cursor: 'pointer',
-                                        border: '2.5px solid ' + findColorByCategory(figurine.category),
-                                        width: '200px',
-                                        height: '260px',
-                                        objectFit: 'cover', // crop to fill
-                                        filter: figurine.status === 'UNRELEASED' || figurine.status === 'RELEASE_TBD' ? 'grayscale(100%)' : 'none',
-                                        transform: 'scale(1)',
-                                        transition: 'filter 0.4s ease, transform 0.4s ease',
-                                        '&:hover': {
-                                            filter: 'none',
-                                            transform: 'scale(1.05)',
-                                        }
-                                    }} />
-                                {/* Figurine Lineup */}
-                                <Box
-                                    component="img"
-                                    src={findMythClothLogoByLineUp(figurine.lineUp)}
-                                    alt="Logo"
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 7,
-                                        left: 5,
-                                        width: 65
-                                    }}
-                                />
-                                {/* Ribbon Revival */}
-                                {figurine.revival && <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 10,
-                                        right: -40,
-                                        backgroundColor: findRevivalColorByFigurine(figurine.category),
-                                        color: '#1f1e25',
-                                        padding: '4px 40px',
-                                        transform: 'rotate(45deg)',
-                                        fontWeight: 'bold',
-                                        fontSize: 10,
-                                        zIndex: 1,
-                                    }}
-                                >
-                                    Revival
-                                </Box>
-                                }
-                                {/* Ribbon Metal */}
-                                {figurine.metal &&
+                {loading ?
+                    <Grid container spacing={4.5}>
+                        {Array.from({ length: 30 }).map((_, index) => (
+                            <Skeleton key={index} variant="rectangular" width={200} height={330} />
+                        ))}
+                    </Grid>
+                    :
+                    <Grid container spacing={4.5}>
+                        {displayableFigurinesPerPage.map((figurine) => (
+                            <Card key={figurine.id} sx={{
+                                minWidth: 200,
+                                maxWidth: 200,
+                                borderRadius: 1, // optional rounded corners
+                                boxShadow: 'none', // remove default shadow if desired
+                            }}>
+                                <CardActionArea>
+                                    {/* Figurine image */}
+                                    <CardMedia
+                                        component="img"
+                                        image={figurine.officialImages ? figurine.officialImages[0] : "-"}
+                                        onDoubleClick={() => handleClickOpen(figurine)}
+                                        sx={{
+                                            cursor: 'pointer',
+                                            border: '2.5px solid ' + findColorByCategory(figurine.category),
+                                            width: '200px',
+                                            height: '260px',
+                                            objectFit: 'cover', // crop to fill
+                                            filter: figurine.status === 'UNRELEASED' || figurine.status === 'RELEASE_TBD' ? 'grayscale(100%)' : 'none',
+                                            transform: 'scale(1)',
+                                            transition: 'filter 0.4s ease, transform 0.4s ease',
+                                            '&:hover': {
+                                                filter: 'none',
+                                                transform: 'scale(1.05)',
+                                            }
+                                        }} />
+                                    {/* Figurine Lineup */}
                                     <Box
+                                        component="img"
+                                        src={findMythClothLogoByLineUp(figurine.lineUp)}
+                                        alt="Logo"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 7,
+                                            left: 5,
+                                            width: 65
+                                        }}
+                                    />
+                                    {/* Ribbon Revival */}
+                                    {figurine.revival && <Box
                                         sx={{
                                             position: 'absolute',
                                             top: 10,
                                             right: -40,
-                                            backgroundColor: '#38322b',
-                                            color: '#efe8cb',
+                                            backgroundColor: findRevivalColorByFigurine(figurine.category),
+                                            color: '#1f1e25',
                                             padding: '4px 40px',
                                             transform: 'rotate(45deg)',
                                             fontWeight: 'bold',
@@ -493,32 +479,52 @@ const FigureListing = ({ navigate }) => {
                                             zIndex: 1,
                                         }}
                                     >
-                                        EX Metal
+                                        Revival
                                     </Box>
-                                }
-                                <CardContent>
-                                    <Tooltip title={hasReleaseDate(figurine.status) ? (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)) : ""}>
-                                        <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
-                                            {figurine.displayableName}
-                                        </Typography>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} gutterBottom>
-                                            {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
-                                        </Typography>
-                                        {figurine.status === "FUTURE_RELEASE" ?
-                                            <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
-                                                Scheduled for release in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
+                                    }
+                                    {/* Ribbon Metal */}
+                                    {figurine.metal &&
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 10,
+                                                right: -40,
+                                                backgroundColor: '#38322b',
+                                                color: '#efe8cb',
+                                                padding: '4px 40px',
+                                                transform: 'rotate(45deg)',
+                                                fontWeight: 'bold',
+                                                fontSize: 10,
+                                                zIndex: 1,
+                                            }}
+                                        >
+                                            EX Metal
+                                        </Box>
+                                    }
+                                    <CardContent>
+                                        <Tooltip title={hasReleaseDate(figurine.status) ? (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)) : ""}>
+                                            <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                                {figurine.displayableName}
                                             </Typography>
-                                            : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                                {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
+                                            </Typography>
+                                            {figurine.status === "FUTURE_RELEASE" ?
                                                 <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
-                                                    First appearance in {formatDate(figurine.distributionJPY.firstAnnouncementDate, true)}
+                                                    Scheduled for release in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
                                                 </Typography>
-                                                : ""}
-                                    </Tooltip>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
-                    ))}
-                </Grid>
+                                                : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
+                                                    <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
+                                                        First appearance in {formatDate(figurine.distributionJPY.firstAnnouncementDate, true)}
+                                                    </Typography>
+                                                    : ""}
+                                        </Tooltip>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        ))}
+                    </Grid>
+                }
             </Box>
             <Box sx={{ border: '0px solid gray', paddingTop: 1 }} >
                 <Pagination count={Math.ceil(filteredFigurines.length / MAX_RECORDS_PER_PAGE)}
