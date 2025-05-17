@@ -43,7 +43,7 @@ const FigureListing = ({ navigate }) => {
     const [setSelectedOption, setSetSelectedOption] = useState('');
 
     // Pagination section
-    const MAX_RECORDS_PER_PAGE = 30;
+    const MAX_RECORDS_PER_PAGE = 50;
     const [page, setPage] = useState(1);
 
 
@@ -190,6 +190,30 @@ const FigureListing = ({ navigate }) => {
     const handleClickOpen = (figurine) => {
         navigate('/mythcloth/figurine-' + figurine.id);
     };
+
+    const hasReleaseDate = (status) => {
+        return !(status === "UNRELEASED" || status === "PROTOTYPE" || status === "RELEASE_TBD" || status === "FUTURE_RELEASE");
+    }
+
+    const calculateTotalFigurines = (figurines) => {
+        if (figurines.length === 0) {
+            return "No figurines were found";
+        } else if (figurines.length === 1) {
+            if (hasReleaseDate(figurines[0].status)) {
+                return "We found a single figurine whose release date is: " + formatDate(figurines[0].distributionJPY.releaseDate, figurines[0].distributionJPY.releaseDateConfirmed);
+            } else {
+                return "We found a single figurine whose release date is not available";
+            }
+        } else {
+            const init = figurines[figurines.length - 1];
+            const end = figurines[0];
+            if (hasReleaseDate(init.status) && hasReleaseDate(end.status)) {
+                return "We found " + figurines.length + " figurines whose release date is from " + formatDate(init.distributionJPY.releaseDate, init.distributionJPY.releaseDateConfirmed) + " to " + formatDate(end.distributionJPY.releaseDate, end.distributionJPY.releaseDateConfirmed);
+            } else {
+                return "We found " + figurines.length + " figurines";
+            }
+        }
+    }
 
     return loading ? (
         <label>s</label>
@@ -386,7 +410,7 @@ const FigureListing = ({ navigate }) => {
             </Collapse>
             <Box sx={{ border: '0px solid gray', padding: 1 }} >
                 <Typography variant='caption'>
-                    {filteredFigurines.length} figurines found
+                    {calculateTotalFigurines(filteredFigurines)}
                 </Typography>
             </Box>
             <Box sx={{
@@ -473,9 +497,7 @@ const FigureListing = ({ navigate }) => {
                                     </Box>
                                 }
                                 <CardContent>
-                                    <Tooltip title={figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" || figurine.status === "RELEASE_TBD" || figurine.status === "FUTURE_RELEASE" ? "" :
-                                        (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed))
-                                    }>
+                                    <Tooltip title={hasReleaseDate(figurine.status) ? (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)) : ""}>
                                         <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
                                             {figurine.displayableName}
                                         </Typography>
