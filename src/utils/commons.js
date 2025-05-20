@@ -34,6 +34,21 @@ const lineUpLogoMap = new Map([
     ['DDP', 'https://imagizer.imageshack.com/img923/9839/zPtgsH.png']
 ]);
 
+const statusesMap = new Map([
+    ['FUTURE_RELEASE', 'Future Release Confirmed'],
+    ['PROTOTYPE', 'Prototype'],
+    ['RELEASE_TBD', 'Release not Confirmed yet'],
+    ['RELEASED', 'Released'],
+    ['UNRELEASED', 'Never Released']
+]);
+
+export const getKeyDescriptionStatuses = (statuses) => {
+    return statuses
+        .map(status => ({
+            key: status,
+            description: statusesMap.get(status)
+        }));
+}
 
 export const findColorByCategory = (category) => {
     if (category) {

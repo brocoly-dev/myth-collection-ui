@@ -5,10 +5,11 @@ import { useState, useEffect } from "react";
 
 import OpenFilterIcon from '@mui/icons-material/FilterList';
 import HideFilterIcon from '@mui/icons-material/FilterListOff';
+import ClearFilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 import Grid from '@mui/material/Grid2';
 import { formatAmount, formatDate } from '../utils/formatters';
-import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine } from '../utils/commons';
+import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine, getKeyDescriptionStatuses } from '../utils/commons';
 
 import BasicBooleanFiltering from './BasicBooleanFiltering.js';
 
@@ -42,6 +43,9 @@ const FigureListing = ({ navigate }) => {
     const [comicSelectedOption, setComicSelectedOption] = useState('');
     const [setSelectedOption, setSetSelectedOption] = useState('');
 
+    const [statuses, setStatuses] = useState([]);
+    const [statusesSelectedOption, setStatusesSelectedOption] = useState('');
+
     // Pagination section
     const MAX_RECORDS_PER_PAGE = 50;
     const [page, setPage] = useState(1);
@@ -53,6 +57,7 @@ const FigureListing = ({ navigate }) => {
             .then(function (response) {
                 setFigurines(response.data); // Assume response.data is an array of objects
                 setFigurineNames(extractFigurineNames(response.data));
+                setStatuses(extractFigurineStatuses(response.data));
                 setLoading(false);
             }).catch(function (error) {
                 setLoading(true);
@@ -172,6 +177,30 @@ const FigureListing = ({ navigate }) => {
     if (setSelectedOption.length !== 0) {
         filteredFigurines = filteredFigurines.filter(f => f.set.toString() === setSelectedOption);
     }
+    // filter by status
+    if (statusesSelectedOption.length !== 0) {
+        const index = statusesSelectedOption.indexOf("|");
+        const statusValue = statusesSelectedOption.substring(0, index);
+        filteredFigurines = filteredFigurines.filter(f => f.status.toString() === statusValue);
+    }
+
+    const resetFilters = () => {
+        setFigurineFinderValue("");
+        setLineUpSelectedOption("");
+        setCategorySelectedOption("");
+        setSeriesSelectedOption("");
+        setMetalSelectedOption("");
+        setOceSelectedOption("");
+        setRevivalSelectedOption("");
+        setHkSelectedOption("");
+        setGoldenSelectedOption("");
+        setGoldSelectedOption("");
+        setBrokenSelectedOption("");
+        setPlainSelectedOption("");
+        setComicSelectedOption("");
+        setSetSelectedOption("");
+        setStatusesSelectedOption("");
+    }
 
 
     const displayableFigurinesPerPage = filteredFigurines.slice(
@@ -185,6 +214,15 @@ const FigureListing = ({ navigate }) => {
             a.toLowerCase().localeCompare(b.toLowerCase())
         );
         return uniqueNames;
+    }
+
+    const extractFigurineStatuses = (figurines) => {
+        const allStatuses = figurines.map(f => f.status);
+        const uniqueStatuses = [...new Set(allStatuses)].sort((a, b) =>
+            a.toLowerCase().localeCompare(b.toLowerCase())
+        );
+
+        return getKeyDescriptionStatuses(uniqueStatuses);
     }
 
     const handleClickOpen = (figurine) => {
@@ -225,6 +263,11 @@ const FigureListing = ({ navigate }) => {
                 <Tooltip title={showFilters ? "Hide filters" : "Show filter options"}>
                     <IconButton onClick={() => setShowFilters(prev => !prev)} aria-label="Toggle Filters">
                         {showFilters ? <HideFilterIcon /> : <OpenFilterIcon />}
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title={showFilters ? "Reset filters" : ""}>
+                    <IconButton disabled={!showFilters} onClick={() => resetFilters()}>
+                        <ClearFilterAltOffIcon />
                     </IconButton>
                 </Tooltip>
             </Box>
@@ -403,6 +446,29 @@ const FigureListing = ({ navigate }) => {
                             valueSelected={setSelectedOption}
                             onChangeFiltering={(newValue) => { setSetSelectedOption(newValue); }}
                         />
+                        <FormControl size="small" variant="outlined">
+                            <InputLabel id="series-label">Figurine Status</InputLabel>
+                            <Select
+                                labelId="status-label"
+                                label="Figurine Status"
+                                name="status"
+                                sx={{ width: 360 }}
+                                value={statusesSelectedOption}
+                                onChange={(event) => {
+                                    setStatusesSelectedOption(event.target.value);
+                                }}
+                            >
+                                {/* Render the MenuItem components based on the fetched data */}
+                                <MenuItem value="">
+                                    <em>All</em>
+                                </MenuItem>
+                                {statuses.map((item) => (
+                                    <MenuItem key={item.key} value={item.key + '|' + item.description}>
+                                        {item.description}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Grid>
                 </Box>
             </Collapse>
