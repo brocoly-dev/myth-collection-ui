@@ -17,7 +17,7 @@ import { useEffect, useState, useMemo } from "react";
 import axios from '../utils/axiosValidationInterceptor';
 import FigureView from './FigureView';
 import Dashboard from './Dashboard/Dashboard';
-import FigureListing from './FigureListing';
+import FigureListing from './FigureListing/FigureListing';
 
 function createNavigation(basicFigurines, lineups) {
     let initialNav = [

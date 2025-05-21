@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
-import axios from '../utils/axiosValidationInterceptor';
+import axios from '../../utils/axiosValidationInterceptor.js';
 
 import { useState, useEffect } from "react";
 
@@ -8,8 +8,8 @@ import HideFilterIcon from '@mui/icons-material/FilterListOff';
 import ClearFilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 import Grid from '@mui/material/Grid2';
-import { formatAmount, formatDate } from '../utils/formatters';
-import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine, getKeyDescriptionStatuses } from '../utils/commons';
+import { formatAmount, formatDate } from '../../utils/formatters.js';
+import { findColorByCategory, findMythClothLogoByLineUp, findRevivalColorByFigurine, getKeyDescriptionStatuses } from '../../utils/commons.js';
 
 import BasicBooleanFiltering from './BasicBooleanFiltering.js';
 
