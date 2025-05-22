@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Box, Card, CardActionArea, CardContent, CardMedia, Collapse, Divider, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import axios from '../../utils/axiosValidationInterceptor.js';
 
 import { useState, useEffect } from "react";
@@ -6,6 +6,9 @@ import { useState, useEffect } from "react";
 import OpenFilterIcon from '@mui/icons-material/FilterList';
 import HideFilterIcon from '@mui/icons-material/FilterListOff';
 import ClearFilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheckRounded';
+import EditNoteIcon from '@mui/icons-material/EditNoteRounded';
+import FullscreenIcon from '@mui/icons-material/FullscreenRounded';
 
 import Grid from '@mui/material/Grid2';
 import { formatAmount, formatDate } from '../../utils/formatters.js';
@@ -45,6 +48,8 @@ const FigureListing = ({ navigate }) => {
 
     const [statuses, setStatuses] = useState([]);
     const [statusesSelectedOption, setStatusesSelectedOption] = useState('');
+
+    // Actions
 
     // Pagination section
     const MAX_RECORDS_PER_PAGE = 50;
@@ -554,6 +559,19 @@ const FigureListing = ({ navigate }) => {
                                             width: '30%'
                                         }}
                                     />
+                                    {/* Is HK version? */}
+                                    {figurine.hk && <Box
+                                        component="img"
+                                        src='https://flagpedia.net/data/flags/w80/hk.png'
+                                        alt='HK distribution'
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 7,
+                                            right: 7,
+                                            width: '13%'
+                                        }}
+                                    />
+                                    }
                                     {/* Ribbon Revival */}
                                     {figurine.revival && <Box
                                         sx={{
@@ -591,24 +609,45 @@ const FigureListing = ({ navigate }) => {
                                             EX Metal
                                         </Box>
                                     }
-                                    <CardContent>
-                                        <Tooltip title={hasReleaseDate(figurine.status) ? (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)) : ""}>
-                                            <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
-                                                {figurine.displayableName}
-                                            </Typography>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} gutterBottom>
-                                                {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
-                                            </Typography>
-                                            {figurine.status === "FUTURE_RELEASE" ?
-                                                <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
-                                                    Scheduled for release in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
+                                    <CardContent
+                                        onDoubleClick={() => alert('d')}>
+                                        <Stack direction={'column'} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
+                                            <Stack direction={'row'} spacing={.5}>
+                                                {/* Left-aligned icon */}
+                                                <PlaylistAddCheckIcon fontSize='small' color='info' onClick={() => alert('ss')}>
+                                                    {showFilters ? <HideFilterIcon /> : <OpenFilterIcon />}
+                                                </PlaylistAddCheckIcon>
+
+                                                {/* Spacer pushes following icons to the right */}
+                                                <Box sx={{ flexGrow: 1 }} />
+
+                                                {/* Right-aligned icons */}
+                                                <EditNoteIcon fontSize='small' onClick={() => setShowFilters(prev => !prev)} aria-label="Toggle Filters">
+                                                    {showFilters ? <HideFilterIcon /> : <OpenFilterIcon />}
+                                                </EditNoteIcon>
+                                                <FullscreenIcon fontSize='small' onClick={() => setShowFilters(prev => !prev)} aria-label="Toggle Filters">
+                                                    {showFilters ? <HideFilterIcon /> : <OpenFilterIcon />}
+                                                </FullscreenIcon>
+                                            </Stack>
+                                            <Tooltip title={hasReleaseDate(figurine.status) ? (formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)) : ""}>
+                                                <Typography variant="subtitle3" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                                    {figurine.displayableName}
                                                 </Typography>
-                                                : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} gutterBottom>
+                                                    {figurine.status === "RELEASED" || figurine.status === "FUTURE_RELEASE" ? formatAmount(figurine.distributionJPY.finalPrice) : ""}
+                                                </Typography>
+                                                {figurine.status === "FUTURE_RELEASE" ?
                                                     <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
-                                                        First appearance in {formatDate(figurine.distributionJPY.firstAnnouncementDate, true)}
+                                                        Scheduled for release in {formatDate(figurine.distributionJPY.releaseDate, figurine.distributionJPY.releaseDateConfirmed)}
                                                     </Typography>
-                                                    : ""}
-                                        </Tooltip>
+                                                    : figurine.status === "UNRELEASED" || figurine.status === "PROTOTYPE" ?
+                                                        <Typography variant="caption" sx={{ fontSize: '9.5px' }}>
+                                                            First appearance in {formatDate(figurine.distributionJPY.firstAnnouncementDate, true)}
+                                                        </Typography>
+                                                        : ""}
+
+                                            </Tooltip>
+                                        </Stack>
                                     </CardContent>
                                 </CardActionArea>
                             </Card>
