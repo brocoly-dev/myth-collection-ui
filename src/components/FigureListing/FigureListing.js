@@ -1,4 +1,4 @@
-import { Autocomplete, Badge, Box, Button, ButtonGroup, Card, CardActionArea, CardContent, CardMedia, Collapse, Divider, FormControl, IconButton, InputLabel, MenuItem, Pagination, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Autocomplete, Badge, Box, Button, ButtonGroup, Card, CardActionArea, CardContent, CardMedia, Collapse, Divider, FormControl, IconButton, InputLabel, MenuItem, Pagination, Popover, Select, Skeleton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import axios from '../../utils/axiosValidationInterceptor.js';
 
 import { useState, useEffect } from "react";
@@ -11,6 +11,8 @@ import EditNoteIcon from '@mui/icons-material/EditNoteRounded';
 import FullscreenIcon from '@mui/icons-material/FullscreenRounded';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+
 
 import Grid from '@mui/material/Grid2';
 import { formatAmount, formatDate } from '../../utils/formatters.js';
@@ -55,6 +57,7 @@ const FigureListing = ({ navigate }) => {
     const [addedToCollection, setAddedToCollection] = useState(false);
     const [totalFigurines, setTotalFigurines] = useState(1);
 
+    const [count, setCount] = useState(1);
 
     // Pagination section
     const MAX_RECORDS_PER_PAGE = 50;
@@ -614,18 +617,35 @@ const FigureListing = ({ navigate }) => {
                                             EX Metal
                                         </Box>
                                     }
-                                    <CardContent
-                                        onDoubleClick={() => alert('d')}>
+                                    <CardContent>
                                         <Stack direction={'column'} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
                                             <Box display={'flex'} alignItems={'center'}>
-                                                <IconButton>
-                                                    <PlaylistAddCheckIcon />
-                                                </IconButton>
+                                                <>
+                                                    <IconButton sx={{ padding: '3px' }}>
+                                                        <Badge color="primary" badgeContent={count}>
+                                                            <PlaylistAddCheckIcon />
+                                                        </Badge>
+                                                    </IconButton>
+                                                    <ButtonGroup variant='text' size='small' >
+                                                        <Button
+                                                            aria-label="reduce"
+                                                            onClick={() => setCount(Math.max(count - 1, 0))}
+                                                        >
+                                                            <RemoveIcon fontSize="inherit" />
+                                                        </Button>
+                                                        <Button
+                                                            aria-label="increase"
+                                                            onClick={() => setCount(count + 1)}
+                                                        >
+                                                            <AddIcon fontSize="inherit" />
+                                                        </Button>
+                                                    </ButtonGroup>
+                                                </>
                                                 <Box sx={{ flexGrow: 1 }} />
-                                                <IconButton>
-                                                    <EditNoteIcon onClick={() => alert('Edit figurine with id: ' + figurine.id)}/>
+                                                <IconButton sx={{ padding: '3px' }}>
+                                                    <EditNoteIcon onClick={() => alert('Edit figurine with id: ' + figurine.id)} />
                                                 </IconButton>
-                                                <IconButton>
+                                                <IconButton sx={{ padding: '3px' }}>
                                                     <FullscreenIcon onClick={() => handleClickOpen(figurine)} />
                                                 </IconButton>
                                             </Box>
