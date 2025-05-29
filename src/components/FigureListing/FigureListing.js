@@ -57,7 +57,8 @@ const FigureListing = ({ navigate }) => {
     const [addedToCollection, setAddedToCollection] = useState(false);
     const [totalFigurines, setTotalFigurines] = useState(1);
 
-    const [count, setCount] = useState(1);
+    const [count, setCount] = useState(0);
+    const [showCounter, setShowCounter] = useState(false);
 
     // Pagination section
     const MAX_RECORDS_PER_PAGE = 50;
@@ -621,25 +622,41 @@ const FigureListing = ({ navigate }) => {
                                         <Stack direction={'column'} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
                                             <Box display={'flex'} alignItems={'center'}>
                                                 <>
-                                                    <IconButton sx={{ padding: '3px' }}>
-                                                        <Badge color="primary" badgeContent={count}>
+                                                    <IconButton sx={{ padding: '3px' }} onClick={() => {
+                                                        setShowCounter(true);
+                                                        setCount(1);
+                                                    }}>
+                                                        <Badge
+                                                            color="success"
+                                                            badgeContent={count}
+                                                            anchorOrigin={{
+                                                                vertical: 'top',
+                                                                horizontal: 'left',
+                                                            }}
+                                                        >
+
                                                             <PlaylistAddCheckIcon />
                                                         </Badge>
                                                     </IconButton>
-                                                    <ButtonGroup variant='text' size='small' >
-                                                        <Button
-                                                            aria-label="reduce"
-                                                            onClick={() => setCount(Math.max(count - 1, 0))}
-                                                        >
-                                                            <RemoveIcon fontSize="inherit" />
-                                                        </Button>
-                                                        <Button
-                                                            aria-label="increase"
-                                                            onClick={() => setCount(count + 1)}
-                                                        >
-                                                            <AddIcon fontSize="inherit" />
-                                                        </Button>
-                                                    </ButtonGroup>
+                                                    {showCounter &&
+                                                        <ButtonGroup variant='text' size='small' >
+                                                            <Button
+                                                                aria-label="reduce"
+                                                                onClick={() => {
+                                                                    setShowCounter(count !== 1);
+                                                                    setCount(Math.max(count - 1, 0));
+                                                                }}
+                                                            >
+                                                                <RemoveIcon fontSize="inherit" />
+                                                            </Button>
+                                                            <Button
+                                                                aria-label="increase"
+                                                                onClick={() => setCount(count + 1)}
+                                                            >
+                                                                <AddIcon fontSize="inherit" />
+                                                            </Button>
+                                                        </ButtonGroup>
+                                                    }
                                                 </>
                                                 <Box sx={{ flexGrow: 1 }} />
                                                 <IconButton sx={{ padding: '3px' }}>
